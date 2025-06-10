@@ -1,0 +1,26 @@
+/* Estilo para header y footer */
+header, footer {
+    background-color: var(--pico-primary);
+    color: var(--pico-primary-inverse);
+    padding: 1.5rem;
+    text-align: left;
+    font-size: 1.6em;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Estilo para el cuerpo con layout de grid */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    font-family: system-ui, sans-serif;
+    background-color: #f9f9f9;
+  }
+  ul.errors{
+    color: red;
+    font-weight: bold;
+    font-size: 0,8em;
+  }
+  

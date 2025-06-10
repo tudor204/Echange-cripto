@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block section %}
+<table>
+    <thead>
+      <tr>
+        <th>Fecha </th>
+        <th>Hora</th>
+        <th>Moneda usada</th>
+        <th>Cantidad</th>
+        <th>Moneda comprada</th>
+        <th>Cantidad</th>
+        <th>Precio unidad</th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for mov in data %}
+      <tr>
+        <td>{{ mov['Fecha'] }} </td>
+        <td>{{ mov['Hora']}} </td>
+        <td>{{ mov['Moneda_from']}} </td>
+        <td>{{ mov['Cantidad_from']}} </td>
+        <td>{{ mov['Moneda_to']}} </td>
+        <td>{{ mov['Cantidad_to']}} </td>
+        
+       
+      </tr>
+      {% else %}
+      <tr><td colspan="4" style="text-align:center; font-style: italic; color: #777;">No hay movimientos registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+
+</table>
+
+   
+    
+
+
+{% endblock %}
