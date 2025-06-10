@@ -1,18 +1,67 @@
-from app.conexion import Conexion
+import requests
+from .conexion import Conexion
+from app import COINAPI_KEY
 
+def get_exchange_rate(from_currency, to_currency):
+    url = f"https://rest.coinapi.io/v1/exchangerate/{from_currency}/{to_currency}"
+    headers = {'X-CoinAPI-Key': COINAPI_KEY}
+    response = requests.get(url, headers=headers, timeout=10)
+    if response.status_code == 200:
+        return response.json().get('rate', 0)
+    return 0
 
 def select_all():
-    conectar = Conexion("select * from criptomonedas order by Fecha DESC")    
-    filas = conectar.res.fetchall()
-    columnas = conectar.res.description #columnas
-    lista_diccionario=[]  
+    con = Conexion(
+        "SELECT * FROM criptomonedas ORDER BY Fecha DESC, Hora DESC"
+    )
+    rows = con.fetch_all()
+    con.close()
+    return rows
 
-    for f in filas:
-        diccionario={}    
-        posicion=0
-        for c in columnas:
-            diccionario[c[0]] = f[posicion]
-            posicion +=1
-        lista_diccionario.append(diccionario)
-    conectar.con.close()
-    return lista_diccionario
+def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to):
+    con = Conexion(
+        """INSERT INTO criptomonedas 
+           (Fecha, Hora, Moneda_From, Cantidad_From, Moneda_To, Cantidad_To)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to)
+    )
+    con.close()
+
+def calcular_saldo(moneda):
+    con = Conexion(
+        """SELECT
+             SUM(CASE WHEN Moneda_To = ? THEN Cantidad_To ELSE 0 END) -
+             SUM(CASE WHEN Moneda_From = ? THEN Cantidad_From ELSE 0 END) AS Saldo
+           FROM criptomonedas""",
+        (moneda, moneda)
+    )
+    saldo = con.res.fetchone()[0] or 0
+    con.close()
+    return saldo
+
+def get_wallet_cryptos():
+    con = Conexion(
+        """SELECT DISTINCT Moneda_To AS moneda FROM criptomonedas
+           UNION SELECT DISTINCT Moneda_From AS moneda FROM criptomonedas"""
+    )
+    rows = [r['moneda'] for r in con.fetch_all() if r['moneda'] != 'EUR']
+    con.close()
+    # Solo devolver las que realmente tienen saldo > 0
+    return [m for m in rows if calcular_saldo(m) > 0]
+
+def get_top_cryptos(limit=20):
+    url = "https://rest.coinapi.io/v1/assets"
+    headers = {'X-CoinAPI-Key': COINAPI_KEY}
+    resp = requests.get(url, headers=headers, timeout=10)
+    if resp.status_code == 200:
+        data = resp.json()
+        # Filtrar solo cripto y con precio_usd definido
+        crypto = [a for a in data if a.get('type_is_crypto') == 1 and a.get('price_usd')]
+        # Ordenar por volumen diario en USD (mayor a menor)
+        crypto_sorted = sorted(
+            crypto,
+            key=lambda x: float(x.get('volume_1day_usd', 0)),
+            reverse=True
+        )
+        return [a['asset_id'] for a in crypto_sorted[:limit]]
+    return ['BTC', 'ETH', 'USDT', 'BNB', 'XRP']  # fallback

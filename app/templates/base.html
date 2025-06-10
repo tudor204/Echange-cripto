@@ -1,29 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css">
-    <title>Proyecto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css" />
+  <title>Resumen de Inversiones</title>
+  <style>
+    body {
+      background-color: #f4f6f8;
+    }
+    header {
+      background-color: #ffffff;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+    nav ul {
+      display: flex;
+      gap: 1rem;
+    }
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #888;
+      border-top: 1px solid #e0e0e0;
+    }
+    .crypto-icon {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    table {
+      overflow-x: auto;
+      display: block;
+      white-space: nowrap;
+    }
+    th, td {
+      vertical-align: middle;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Resumen de inversiones</h1>
-        <nav>
-            <ul>
-              <li><a href="/" role="button">Inicio</a></li>
-              <li><a href="/new" role="button">Compra</a></li>
-              <li><a href="/new" role="button">Estado</a></li>
-            </ul>
-          </nav>
 
+  <header>
+    <h1>Resumen de Inversiones</h1>
+    <nav>
+      <ul>
+        <li><a href="/" role="button">Inicio</a></li>
+        <li><a href="/purchase" role="button">Compra</a></li>
+        <li><a href="/status" role="button">Estado</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    </header>
+  <main class="container">
     {% block section %}
     {% endblock %}
-    <footer>
-        <small>&copy; 2025 - Manuel Jesús Martos Martos</small>
-    </footer>
-    
+  </main>
+
+  <footer>
+    <small>&copy; 2025 - Manuel Jesús Martos Martos</small>
+  </footer>
+
 </body>
 </html>

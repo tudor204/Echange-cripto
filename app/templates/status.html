@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Estado de la Inversión</h2>
+<div class="metrics">
+    <p><strong>Invertido:</strong> {{ invertido|round(2) }} EUR</p>
+    <p><strong>Recuperado:</strong> {{ recuperado|round(2) }} EUR</p>
+    <p><strong>Valor de compra:</strong> {{ valor_compra|round(2) }} EUR</p>
+</div>
+{% endblock %}

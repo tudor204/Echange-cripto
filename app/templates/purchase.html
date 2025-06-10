@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block section %}
+
+<section style="padding: 2rem; background-color: #ffffff; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 600px; margin: auto;">
+  <h2 style="margin-bottom: 1.5rem;">Compra / Venta de Criptomonedas</h2>
+
+  <form method="POST">
+    <label for="from_currency">De:</label>
+    <select name="from_currency" id="from_currency" required>
+      {% for code in monedas_disponibles %}
+        <option value="{{ code }}" {% if code == 'EUR' %}selected{% endif %}>
+          {{ code }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="amount">Cantidad:</label>
+    <input type="number" name="amount" id="amount" step="0.000001" placeholder="Introduce cantidad" required>
+
+    <label for="to_currency">A:</label>
+    <select name="to_currency" id="to_currency" required>
+      {% for code in monedas_disponibles if code != 'EUR' %}
+        <option value="{{ code }}">{{ code }}</option>
+      {% endfor %}
+    </select>
+
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+      <button type="submit">Calcular</button>
+      <button type="submit" name="confirm" class="secondary">Confirmar</button>
+    </div>
+  </form>
+
+  {% if messages %}
+    <div style="margin-top: 1.5rem;">
+      {% for category, message in messages %}
+        <div class="{{ category }}" style="padding: 0.75rem 1rem; border-radius: 6px; background-color: {% if category == 'success' %}#d1e7dd{% elif category == 'error' %}#f8d7da{% else %}#fefefe{% endif %}; color: #333;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}

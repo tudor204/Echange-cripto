@@ -1,41 +1,75 @@
 {% extends "base.html" %}
 
 {% block section %}
-<table>
+
+<!-- Diccionario de íconos -->
+{% set icon_base = "https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.17.1/svg/color/" %}
+{% set icon_map = {
+  'btc': 'btc.svg',
+  'eth': 'eth.svg',
+  'usdt': 'usdt.svg',
+  'bnb': 'bnb.svg',
+  'ada': 'ada.svg',
+  'xrp': 'xrp.svg',
+  'sol': 'sol.svg',
+  'dot': 'dot.svg',
+  'ltc': 'ltc.svg',
+  'doge': 'doge.svg',
+  'eur': 'eur.svg',
+  'usd': 'usd.svg'
+} %}
+
+<section style="padding: 2rem; background-color: #ffffff; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+  <h2>Historial de Movimientos</h2>
+
+  <table style="min-width: 850px;">
     <thead>
       <tr>
-        <th>Fecha </th>
+        <th style="min-width: 140px;">Fecha</th>
         <th>Hora</th>
         <th>Moneda usada</th>
         <th>Cantidad</th>
         <th>Moneda comprada</th>
         <th>Cantidad</th>
         <th>Precio unidad</th>
-
       </tr>
     </thead>
-
     <tbody>
       {% for mov in data %}
       <tr>
-        <td>{{ mov['Fecha'] }} </td>
-        <td>{{ mov['Hora']}} </td>
-        <td>{{ mov['Moneda_from']}} </td>
-        <td>{{ mov['Cantidad_from']}} </td>
-        <td>{{ mov['Moneda_to']}} </td>
-        <td>{{ mov['Cantidad_to']}} </td>
-        
-       
+        <td>{{ mov['Fecha'] }}</td>
+        <td>{{ mov['Hora'] }}</td>
+
+        <td>
+          {% set from_symbol = mov['Moneda_from']|lower %}
+          {% if icon_map[from_symbol] %}
+            <img src="{{ icon_base ~ icon_map[from_symbol] }}" alt="{{ from_symbol }}" class="crypto-icon">
+          {% endif %}
+          {{ mov['Moneda_from'] }}
+        </td>
+
+        <td>{{ mov['Cantidad_from'] }}</td>
+
+        <td>
+          {% set to_symbol = mov['Moneda_to']|lower %}
+          {% if icon_map[to_symbol] %}
+            <img src="{{ icon_base ~ icon_map[to_symbol] }}" alt="{{ to_symbol }}" class="crypto-icon">
+          {% endif %}
+          {{ mov['Moneda_to'] }}
+        </td>
+
+        <td>{{ mov['Cantidad_to'] }}</td>
+        <td>{{ mov['Precio_unitario'] }}</td>
       </tr>
       {% else %}
-      <tr><td colspan="4" style="text-align:center; font-style: italic; color: #777;">No hay movimientos registrados.</td></tr>
+      <tr>
+        <td colspan="7" style="text-align: center; font-style: italic; color: #777;">
+          No hay movimientos registrados.
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
-
-</table>
-
-   
-    
-
+  </table>
+</section>
 
 {% endblock %}
