@@ -2,13 +2,6 @@ import requests
 from .conexion import Conexion
 from app import COINAPI_KEY
 
-def get_exchange_rate(from_currency, to_currency):
-    url = f"https://rest.coinapi.io/v1/exchangerate/{from_currency}/{to_currency}"
-    headers = {'X-CoinAPI-Key': COINAPI_KEY}
-    response = requests.get(url, headers=headers, timeout=10)
-    if response.status_code == 200:
-        return response.json().get('rate', 0)
-    return 0
 
 def select_all():
     con = Conexion(
@@ -40,19 +33,3 @@ def calcular_saldo(moneda):
     return saldo
 
 
-def get_top_cryptos(limit=20):
-    url = "https://rest.coinapi.io/v1/assets"
-    headers = {'X-CoinAPI-Key': COINAPI_KEY}
-    resp = requests.get(url, headers=headers, timeout=10)
-    if resp.status_code == 200:
-        data = resp.json()
-        # Filtrar solo cripto y con precio_usd definido
-        crypto = [a for a in data if a.get('type_is_crypto') == 1 and a.get('price_usd')]
-        # Ordenar por volumen diario en USD (mayor a menor)
-        crypto_sorted = sorted(
-            crypto,
-            key=lambda x: float(x.get('volume_1day_usd', 0)),
-            reverse=True
-        )
-        return [a['asset_id'] for a in crypto_sorted[:limit]]
-    return ['BTC', 'ETH', 'USDT', 'BNB', 'XRP']  # fallback

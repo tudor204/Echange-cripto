@@ -25,7 +25,7 @@ def index():
 
 @app.route("/purchase", methods=["GET", "POST"])
 def purchase():
-    monedas_disponibles = ['EUR'] 
+    monedas_disponibles = ['EUR'] + TOP_20_COINS
 
     if request.method == "POST":
         moneda_from = request.form.get("from_currency")
