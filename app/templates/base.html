@@ -17,10 +17,7 @@
     h1 {
       margin-bottom: 0.5rem;
     }
-    nav ul {
-      display: flex;
-      gap: 1rem;
-    }
+
     footer {
       text-align: center;
       margin-top: 3rem;
@@ -43,6 +40,18 @@
     th, td {
       vertical-align: middle;
     }
+    
+    nav ul {
+      display: flex;
+      gap: 1rem;
+      margin-left: 2rem; /* separación del margen izquierdo */
+    }
+
+    nav a[role="button"].active {
+      background-color: #ff0a0a;
+      color: white;
+    }
+
   </style>
 </head>
 <body>
@@ -51,9 +60,10 @@
     <h1>Resumen de Inversiones</h1>
     <nav>
       <ul>
-        <li><a href="/" role="button">Inicio</a></li>
-        <li><a href="/purchase" role="button">Compra</a></li>
-        <li><a href="/status" role="button">Estado</a></li>
+        <li><a href="/" role="button" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
+        <li><a href="/purchase" role="button" class="{% if request.path == '/purchase' %}active{% endif %}">Compra</a></li>
+        <li><a href="/status" role="button" class="{% if request.path == '/status' %}active{% endif %}">Estado</a></li>
+
       </ul>
     </nav>
   </header>

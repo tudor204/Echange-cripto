@@ -39,15 +39,6 @@ def calcular_saldo(moneda):
     con.close()
     return saldo
 
-def get_wallet_cryptos():
-    con = Conexion(
-        """SELECT DISTINCT Moneda_To AS moneda FROM criptomonedas
-           UNION SELECT DISTINCT Moneda_From AS moneda FROM criptomonedas"""
-    )
-    rows = [r['moneda'] for r in con.fetch_all() if r['moneda'] != 'EUR']
-    con.close()
-    # Solo devolver las que realmente tienen saldo > 0
-    return [m for m in rows if calcular_saldo(m) > 0]
 
 def get_top_cryptos(limit=20):
     url = "https://rest.coinapi.io/v1/assets"
