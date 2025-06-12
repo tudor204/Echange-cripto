@@ -1,36 +1,50 @@
-
 {% extends "base.html" %}
+
 {% block section %}
-<h2>Compra / Tradeo de Criptomonedas</h2>
+  <h2>Compra / Venta de Criptomonedas</h2>
 
-<form method="POST">
-  <label for="from_currency">Desde (From):</label>
-  <select name="from_currency" required>
-    {% for moneda in monedas_disponibles %}
-      <option value="{{ moneda }}" {% if moneda == moneda_from %}selected{% endif %}>{{ moneda }}</option>
-    {% endfor %}
-  </select>
+  <form method="POST" action="/purchase">
 
-  <label for="amount">Cantidad a gastar (Q):</label>
-  <input type="number" step="any" min="0" name="amount" value="{{ cantidad_from or '' }}" required>
-
-  <label for="to_currency">Hacia (To):</label>
-  <select name="to_currency" required>
-    {% for moneda in monedas_disponibles %}
-      <option value="{{ moneda }}" {% if moneda == moneda_to %}selected{% endif %}>{{ moneda }}</option>
-    {% endfor %}
-  </select>
-
-  <div style="margin-top: 1em;">
-    <button type="submit" name="action" value="calcular">Calcular</button>
-    <button type="submit" name="action" value="aceptar">Aceptar</button>
-  </div>
-</form>
-
-{% if cantidad_to %}
-  <p style="margin-top: 1em;">
-    ✅ Con <strong>{{ cantidad_from }}</strong> {{ moneda_from }} obtendrás aproximadamente <strong>{{ cantidad_to | round(6) }}</strong> {{ moneda_to }}.
-  </p>
-{% endif %}
+    <label for="from_currency">De (moneda):</label>
+    <select name="from_currency" id="from_currency" required>
+      {% for moneda in monedas_from %}
+        <option value="{{ moneda }}"
+          {% if moneda == moneda_from %}selected{% elif accion == 'inicio' and moneda == 'EUR' %}selected{% endif %}>
+          {{ moneda }}
+        </option>
+      {% endfor %}
+    </select>
+  
+    <label for="to_currency">A (moneda):</label>
+    <select name="to_currency" id="to_currency" required>
+      {% for moneda in monedas_to %}
+        <option value="{{ moneda }}"
+          {% if moneda == moneda_to %}selected{% endif %}>
+          {{ moneda }}
+        </option>
+      {% endfor %}
+    </select>
+  
+    <label for="amount">Cantidad a convertir ({{ moneda_from if moneda_from else 'EUR' }}):</label>
+    <input type="number" name="amount" id="amount" min="0.000001" step="any" required
+      value="{{ cantidad_from if cantidad_from else '' }}" />
+  
+    {% if accion == 'calcular' %}
+      <p><strong>Tasa de cambio:</strong> 1 {{ moneda_from }} = {{ tasa_cambio }} {{ moneda_to }}</p>
+      <p><strong>Cantidad estimada que recibirás:</strong> {{ cantidad_to }}</p>
+  
+      <!-- Campo oculto para enviar cantidad calculada a validar -->
+      <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}" />
+  
+      <button type="submit" name="accion" value="validar">Validar compra/venta</button>
+      <button type="submit" name="accion" value="calcular">Recalcular</button>
+  
+    {% else %}
+      <button type="submit" name="accion" value="calcular">Calcular cantidad</button>
+    {% endif %}
+  
+  </form>
+  
+  
 
 {% endblock %}

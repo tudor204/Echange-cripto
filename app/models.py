@@ -33,3 +33,28 @@ def calcular_saldo(moneda):
     saldo = con.res.fetchone()[0] or 0
     con.close()
     return saldo
+
+
+def obtener_monedas_con_saldo():
+    con = Conexion("""
+        SELECT moneda FROM (
+            SELECT Moneda_To as moneda, 
+                   SUM(Cantidad_To) - 
+                   COALESCE((SELECT SUM(Cantidad_From) FROM criptomonedas WHERE Moneda_From = Moneda_To), 0) AS saldo
+            FROM criptomonedas
+            GROUP BY Moneda_To
+        )
+        WHERE saldo > 0
+    """)
+    resultados = con.fetch_all()
+    con.close()
+    # Ajustar extracción para lista de diccionarios o tuplas:
+    monedas = [row['moneda'] if isinstance(row, dict) else row[0] for row in resultados]
+
+    # Aseguramos que 'EUR' siempre esté en la lista y al inicio
+    if "EUR" not in monedas:
+        monedas.insert(0, "EUR")
+    else:
+        # Lo movemos al inicio si está en otra posición
+        monedas = ["EUR"] + [m for m in monedas if m != "EUR"]
+    return monedas
