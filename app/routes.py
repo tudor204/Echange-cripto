@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import render_template, request, redirect, flash
 from app import app
-from app.models import select_all, insert_movimiento, calcular_saldo, obtener_monedas_con_saldo
+from app.models import select_all, insert_movimiento, calcular_saldo, obtener_monedas_con_saldo, obtener_todas_criptomonedas
 import requests
 
 # Diccionario de iconos
@@ -24,14 +24,22 @@ def index():
 
 
 
-
 @app.route("/purchase", methods=["GET", "POST"])
 def purchase():
-    monedas_from = obtener_monedas_con_saldo()
-    monedas_to = ['EUR'] + [c for c in monedas_from if c != 'EUR']
+    monedas_con_saldo = obtener_monedas_con_saldo()  # Solo monedas con saldo > 0
+    todas_criptos = obtener_todas_criptomonedas()
+
+    # Si no hay ninguna moneda con saldo (tabla vacía), moneda_from solo EUR
+    if not monedas_con_saldo:
+        monedas_from = ['EUR']
+        monedas_to = [c for c in todas_criptos if c != 'EUR']  # todas menos EUR para comprar
+    else:
+        # Con movimientos: moneda_from = EUR + monedas con saldo
+        monedas_from = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']
+        monedas_to = ['EUR'] + [c for c in todas_criptos if c not in monedas_from]
 
     if request.method == "POST":
-        accion = request.form.get("accion")  # 'calcular' o 'validar'
+        accion = request.form.get("accion")
 
         moneda_from = request.form.get("from_currency")
         moneda_to = request.form.get("to_currency")
@@ -42,11 +50,11 @@ def purchase():
             return redirect("/purchase")
 
         if moneda_from not in monedas_from:
-            flash(f"La moneda de origen {moneda_from} no está disponible para operar.", "error")
+            flash(f"La moneda origen {moneda_from} no está disponible para operar.", "error")
             return redirect("/purchase")
 
         if accion == "calcular":
-            # Consulta la tasa de cambio
+            # Consulta tasa de cambio CoinAPI
             url = f"https://rest.coinapi.io/v1/exchangerate/{moneda_from}/{moneda_to}"
             headers = {'X-CoinAPI-Key': API_KEY}
             response = requests.get(url, headers=headers)
@@ -60,7 +68,6 @@ def purchase():
 
                 cantidad_to = cantidad_from * tasa_cambio
 
-                # Mostrar formulario con resultado calculado
                 return render_template("purchase.html",
                     monedas_from=monedas_from,
                     monedas_to=monedas_to,
@@ -72,11 +79,10 @@ def purchase():
                     accion='calcular'
                 )
             else:
-                flash(f"Error al conectar con CoinAPI: {response.status_code}", "error")
+                flash(f"Error CoinAPI: {response.status_code}", "error")
                 return redirect("/purchase")
 
         elif accion == "validar":
-            # Validar saldo si moneda_from no es EUR
             if moneda_from != "EUR":
                 saldo = calcular_saldo(moneda_from)
                 if saldo < cantidad_from:
@@ -88,10 +94,10 @@ def purchase():
             hora_actual = datetime.now().strftime("%H:%M:%S")
             insert_movimiento(fecha_actual, hora_actual, moneda_from, cantidad_from, moneda_to, cantidad_to)
 
-            flash("Operación registrada exitosamente", "success")
+            flash("Operación registrada con éxito", "success")
             return redirect("/")
 
-    # GET o cualquier otro caso, mostramos formulario limpio
+    # GET o cualquier otro caso
     return render_template("purchase.html",
         monedas_from=monedas_from,
         monedas_to=monedas_to,

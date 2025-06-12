@@ -58,3 +58,30 @@ def obtener_monedas_con_saldo():
         # Lo movemos al inicio si está en otra posición
         monedas = ["EUR"] + [m for m in monedas if m != "EUR"]
     return monedas
+
+def obtener_todas_criptomonedas():
+    # Lista fija o dinámica, aquí un ejemplo fijo de 20 monedas + EUR
+    return ['BTC', 'ETH', 'BNB', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'LTC', 'DOGE', 
+            'AVAX', 'SHIB', 'MATIC', 'TRX', 'UNI', 'ATOM', 'LINK', 'XLM', 'BCH', 'VET', 'EUR']
+
+def calcular_inversion_total():
+    con = Conexion()
+    # Suma todas las cantidades_from en movimientos donde moneda_from = 'EUR'
+    # Porque compra significa EUR -> cripto
+    result = con.fetch_one('''
+        SELECT SUM(cantidad_from * precio) FROM movimientos
+        WHERE moneda_from = 'EUR'
+    ''')
+    return float(result[0]) if result and result[0] is not None else 0.0
+
+
+def calcular_recuperacion_total():
+    con = Conexion()
+    # Suma todas las cantidades_to * precio donde moneda_to = 'EUR'
+    # Porque venta significa cripto -> EUR
+    result = con.fetch_one('''
+        SELECT SUM(cantidad_to * precio) FROM movimientos
+        WHERE moneda_to = 'EUR'
+    ''')
+    return float(result[0]) if result and result[0] is not None else 0.0
+
