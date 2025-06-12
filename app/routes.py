@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import render_template, request, redirect, flash
 from app import app
-from app.models import select_all, insert_movimiento, calcular_saldo, obtener_monedas_con_saldo, obtener_todas_criptomonedas
+from app.models import *
 import requests
 
 # Diccionario de iconos
@@ -103,6 +103,10 @@ def purchase():
         monedas_to=monedas_to,
         accion='inicio'
     )
+
+
+
+    
 
 
 
