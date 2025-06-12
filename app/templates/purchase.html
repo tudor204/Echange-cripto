@@ -1,38 +1,36 @@
+
 {% extends "base.html" %}
 {% block section %}
+<h2>Compra / Tradeo de Criptomonedas</h2>
 
 <form method="POST">
-  <div style="display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-    <div style="flex: 1;">
-      <label for="from_currency">Moneda origen:</label>
-      <select name="from_currency" id="from_currency" required>
-        {% for code in monedas_disponibles %}
-          <option value="{{ code }}" {% if code == 'EUR' %}selected{% endif %}>{{ code }}</option>
-        {% endfor %}
-      </select>
+  <label for="from_currency">Desde (From):</label>
+  <select name="from_currency" required>
+    {% for moneda in monedas_disponibles %}
+      <option value="{{ moneda }}" {% if moneda == moneda_from %}selected{% endif %}>{{ moneda }}</option>
+    {% endfor %}
+  </select>
 
-      <div style="display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-        <input type="number" name="amount" id="amount" step="0.000001" placeholder="Introduce cantidad" required style="flex: 0.2;">
-        <button type="submit">Calcular</button>
-        
-      </div>
-    </div>
+  <label for="amount">Cantidad a gastar (Q):</label>
+  <input type="number" step="any" min="0" name="amount" value="{{ cantidad_from or '' }}" required>
 
-    <div style="flex: 1;">
-      <label for="to_currency">Moneda nueva:</label>
-      <select name="to_currency" id="to_currency" required>
-        {% for code in monedas_disponibles if code != 'EUR' %}
-          <option value="{{ code }}">{{ code }}</option>
-        {% endfor %}
-      </select>
-    </div>
-  </div>
+  <label for="to_currency">Hacia (To):</label>
+  <select name="to_currency" required>
+    {% for moneda in monedas_disponibles %}
+      <option value="{{ moneda }}" {% if moneda == moneda_to %}selected{% endif %}>{{ moneda }}</option>
+    {% endfor %}
+  </select>
 
-  <div style="margin-top: 0.5rem;">
-    <button type="submit" name="confirm" class="primary">Confirmar</button>
+  <div style="margin-top: 1em;">
+    <button type="submit" name="action" value="calcular">Calcular</button>
+    <button type="submit" name="action" value="aceptar">Aceptar</button>
   </div>
 </form>
 
-
+{% if cantidad_to %}
+  <p style="margin-top: 1em;">
+    ✅ Con <strong>{{ cantidad_from }}</strong> {{ moneda_from }} obtendrás aproximadamente <strong>{{ cantidad_to | round(6) }}</strong> {{ moneda_to }}.
+  </p>
+{% endif %}
 
 {% endblock %}

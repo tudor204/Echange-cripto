@@ -26,10 +26,13 @@ def index():
 @app.route("/purchase", methods=["GET", "POST"])
 def purchase():
     monedas_disponibles = ['EUR'] + TOP_20_COINS
+    cantidad_to = None
 
     if request.method == "POST":
         moneda_from = request.form.get("from_currency")
         moneda_to = request.form.get("to_currency")
+        boton = request.form.get("action")  # "calcular" o "aceptar"
+
         try:
             cantidad_from = float(request.form.get("amount", 0))
         except ValueError:
@@ -59,18 +62,21 @@ def purchase():
             flash(f"Error al conectar con CoinAPI: {response.status_code}", "error")
             return redirect("/purchase")
 
-        # Registrar movimiento
-        fecha_actual = datetime.now().strftime("%Y-%m-%d")
-        hora_actual = datetime.now().strftime("%H:%M:%S")
-        insert_movimiento(fecha_actual, hora_actual, moneda_from, cantidad_from, moneda_to, cantidad_to)
-
-        flash("Operación registrada exitosamente", "success")
-        return redirect("/")
+        if boton == "aceptar":
+            fecha_actual = datetime.now().strftime("%Y-%m-%d")
+            hora_actual = datetime.now().strftime("%H:%M:%S")
+            insert_movimiento(fecha_actual, hora_actual, moneda_from, cantidad_from, moneda_to, cantidad_to)
+            flash("Operación registrada exitosamente", "success")
+            return redirect("/")
+        else:
+            # Mostrar solo el resultado de la conversión
+            return render_template("purchase.html", monedas_disponibles=monedas_disponibles,
+                                   cantidad_to=cantidad_to, moneda_from=moneda_from,
+                                   moneda_to=moneda_to, cantidad_from=cantidad_from)
 
     return render_template("purchase.html", monedas_disponibles=monedas_disponibles)
 
 
 @app.route("/status")
 def status():
-    
     return render_template("status.html")

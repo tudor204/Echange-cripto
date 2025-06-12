@@ -11,6 +11,7 @@ def select_all():
     con.close()
     return rows
 
+
 def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to):
     con = Conexion(
         """INSERT INTO criptomonedas 
@@ -19,6 +20,7 @@ def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantid
         (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to)
     )
     con.close()
+
 
 def calcular_saldo(moneda):
     con = Conexion(
@@ -31,5 +33,3 @@ def calcular_saldo(moneda):
     saldo = con.res.fetchone()[0] or 0
     con.close()
     return saldo
-
-
