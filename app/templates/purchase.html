@@ -1,53 +1,205 @@
 {% extends "base.html" %}
 
 {% block section %}
-  <h2>Compra / Venta de Criptomonedas</h2>
+
+<!-- Diccionario de íconos -->
+{% set icon_base = "https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.17.1/svg/color/" %}
+{% set icon_map = {
+  'btc': 'btc.svg',
+  'eth': 'eth.svg',
+  'usdt': 'usdt.svg',
+  'bnb': 'bnb.svg',
+  'ada': 'ada.svg',
+  'xrp': 'xrp.svg',
+  'sol': 'sol.svg',
+  'dot': 'dot.svg',
+  'ltc': 'ltc.svg',
+  'doge': 'doge.svg',
+  'eur': 'eur.svg',
+  'usd': 'usd.svg'
+} %}
+
+<section class="compact-card">
+  <h2 style="margin-bottom: 0.5rem;">Compra/Venta</h2>
+  <p class="subtitle" style="margin-bottom: 1.5rem;">Conversión de criptomonedas</p>
 
   <form method="POST" action="/purchase">
+    <div class="form-row">
+      <div class="form-group compact">
+        <label>De</label>
+        <select name="from_currency" required>
+          {% for moneda in monedas_from %}
+          <option value="{{ moneda }}"
+            {% if moneda==moneda_from %}selected
+            {% elif accion=='inicio' and moneda=='EUR' %}selected
+            {% endif %}>
+            {% if icon_map[moneda|lower] %}
+            <img src="{{ icon_base ~ icon_map[moneda|lower] }}" alt="{{ moneda }}" class="crypto-icon-sm">
+            {% endif %}
+            {{ moneda }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <label for="from_currency">De (moneda):</label>
-    <select name="from_currency" id="from_currency" required>
-  {% for moneda in monedas_from %}
-    <option value="{{ moneda }}"
-      {% if moneda == moneda_from %}selected
-      {% elif accion == 'inicio' and moneda == 'EUR' %}selected
-      {% endif %}>
-      {{ moneda }}
-    </option>
-  {% endfor %}
-</select>
+      <div class="form-group compact">
+        <label>A</label>
+        <select name="to_currency" required>
+          {% for moneda in monedas_to %}
+          <option value="{{ moneda }}"
+            {% if moneda==moneda_to %}selected{% endif %}>
+            {% if icon_map[moneda|lower] %}
+            <img src="{{ icon_base ~ icon_map[moneda|lower] }}" alt="{{ moneda }}" class="crypto-icon-sm">
+            {% endif %}
+            {{ moneda }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
 
-<select name="to_currency" id="to_currency" required>
-  {% for moneda in monedas_to %}
-    <option value="{{ moneda }}"
-      {% if moneda == moneda_to %}selected{% endif %}>
-      {{ moneda }}
-    </option>
-  {% endfor %}
-</select>
-
-
-    <label for="amount">Cantidad a convertir ({{ moneda_from if moneda_from else 'EUR' }}):</label>
-    <input type="number" name="amount" id="amount" min="0.000001" step="any" required
-      value="{{ cantidad_from if cantidad_from else '' }}" />
+    <div class="form-group compact">
+      <label>Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
+      <input type="number" name="amount" min="0.000001" step="any" required
+        value="{{ cantidad_from if cantidad_from else '' }}" 
+        placeholder="Ej: 1000.00" />
+    </div>
 
     {% if accion == 'calcular' %}
-      <p><strong>Tasa de cambio:</strong>
-        1 {{ moneda_from }} = {{ "%.8f"|format(tasa_cambio) }} {{ moneda_to }}
-      </p>
-      <p><strong>Cantidad estimada que recibirás:</strong>
-        {{ "%.8f"|format(cantidad_to) }} {{ moneda_to }}
-      </p>
+    <div class="results">
+      <div class="result-line">
+        <span>Tasa:</span>
+        <span>1 {{ moneda_from }} = {{ "%.6f"|format(tasa_cambio) }} {{ moneda_to }}</span>
+      </div>
+      <div class="result-line highlight">
+        <span>Recibirás:</span>
+        <span>{{ "%.6f"|format(cantidad_to) }} {{ moneda_to }}</span>
+      </div>
 
-      <!-- Campo oculto para enviar cantidad calculada a validar -->
       <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}" />
 
-      <button type="submit" name="accion" value="validar">Validar compra/venta</button>
-      <button type="submit" name="accion" value="calcular">Recalcular</button>
-
+      <div class="button-row">
+        <button type="submit" name="accion" value="validar" class="btn-sm primary">Validar</button>
+        <button type="submit" name="accion" value="calcular" class="btn-sm secondary">Recalcular</button>
+      </div>
+    </div>
     {% else %}
-      <button type="submit" name="accion" value="calcular">Calcular cantidad</button>
+    <button type="submit" name="accion" value="calcular" class="btn-sm primary">Calcular</button>
     {% endif %}
-
   </form>
+</section>
+
+<style>
+  /* Estilos compactos */
+  .compact-card {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-top: -0.5rem;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group.compact {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  .form-group.compact label {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    color: #475569;
+  }
+
+  select, input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+  }
+
+  .crypto-icon-sm {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  .results {
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+
+  .result-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .result-line.highlight {
+    font-weight: 500;
+    color: var(--primary);
+  }
+
+  .button-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-sm.primary {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+  }
+
+  .btn-sm.secondary {
+    background: none;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+  }
+
+  .btn-sm.primary:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .btn-sm.secondary:hover {
+    background-color: #f1f5f9;
+  }
+
+  @media (max-width: 480px) {
+    .compact-card {
+      padding: 1.25rem;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
 {% endblock %}

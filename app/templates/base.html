@@ -1,71 +1,179 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css" />
   <title>Resumen de Inversiones</title>
   <style>
+    /* Estilos personalizados que complementan Pico.css */
+    :root {
+      --primary: #3a86ff;
+      --primary-hover: #2667cc;
+      --active-color: #4cc9f0; /* Nuevo color para estado activo */
+    }
+    
     body {
-      background-color: #f4f6f8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f8f9fa;
     }
+    
     header {
-      background-color: #ffffff;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #e0e0e0;
+      background-color: rgb(184, 233, 240);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 0.rem 0;
+      position:initial;
+      top: 0;
+      z-index: 100;
     }
-    h1 {
-      margin-bottom: 0.5rem;
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
     }
-
-    footer {
-      text-align: center;
-      margin-top: 3rem;
-      padding: 1rem;
-      font-size: 0.9rem;
-      color: #888;
-      border-top: 1px solid #e0e0e0;
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: bold;
+      color: var(--primary);
     }
-    .crypto-icon {
-      width: 20px;
-      height: 20px;
-      vertical-align: middle;
-      margin-right: 6px;
+    
+    .logo-icon {
+      font-size: 1.25rem;
     }
-    table {
-      overflow-x: auto;
-      display: block;
-      white-space: nowrap;
-    }
-    th, td {
-      vertical-align: middle;
+    
+    .logo h1 {
+      font-size: 1.25rem;
+      margin: 0;
     }
     
     nav ul {
+      margin: 0;
+      padding: 0;
       display: flex;
-      gap: 1rem;
-      margin-left: 2rem; /* separación del margen izquierdo */
+      gap: 0.5rem;
     }
-
+    
+    nav a[role="button"] {
+      transition: all 0.3s ease;
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      position: relative;
+      overflow: hidden;
+      font-size: 0.9rem;
+    }
+    
+    /* Estilo para botón activo */
     nav a[role="button"].active {
-      background-color: #ff0a0a;
+      background-color: var(--active-color);
       color: white;
+      font-weight: bold;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-
+    
+    /* Efecto hover para botones no activos */
+    nav a[role="button"]:not(.active):hover {
+      background-color: #f1f1f1;
+      transform: translateY(-1px);
+    }
+    
+    /* Indicador adicional para botón activo */
+    nav a[role="button"].active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 2px;
+      background-color: white;
+      border-radius: 2px;
+    }
+    
+    main.container {
+      flex: 1;
+      padding: 1.5rem 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+      margin-top: auto;
+      font-size: 0.85rem;
+    }
+    
+    .crypto-icon {
+      width: 22px;
+      height: 22px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    
+    /* Mejoras para tablas */
+    table {
+      width: 100%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    th {
+      background-color: var(--primary);
+      color: white;
+      padding: 0.75rem;
+    }
+    
+    /* Responsividad mejorada */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.5rem;
+      }
+      
+      nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.4rem;
+      }
+      
+      nav a[role="button"] {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.85rem;
+      }
+      
+      main.container {
+        padding: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Resumen de Inversiones</h1>
-    <nav>
-      <ul>
-        <li><a href="/" role="button" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
-        <li><a href="/purchase" role="button" class="{% if request.path == '/purchase' %}active{% endif %}">Compra</a></li>
-        <li><a href="/status" role="button" class="{% if request.path == '/status' %}active{% endif %}">Estado</a></li>
-
-      </ul>
-    </nav>
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-icon">📊</span>
+        <h1>Resumen de Inversiones</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/" role="button" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
+          <li><a href="/purchase" role="button" class="{% if request.path == '/purchase' %}active{% endif %}">Compra</a></li>
+          <li><a href="/status" role="button" class="{% if request.path == '/status' %}active{% endif %}">Estado</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main class="container">
@@ -74,7 +182,7 @@
   </main>
 
   <footer>
-    <small>&copy; 2025 - Manuel Jesús Martos Martos</small>
+    <small>&copy; 2025 - Manuel Jesús Martos Martos. Todos los derechos reservados.</small>
   </footer>
 
 </body>
