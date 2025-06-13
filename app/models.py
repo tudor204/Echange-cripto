@@ -2,15 +2,11 @@ import requests
 from .conexion import Conexion
 from app import COINAPI_KEY
 
-
 def select_all():
-    con = Conexion(
-        "SELECT * FROM criptomonedas ORDER BY Fecha DESC, Hora DESC"
-    )
+    con = Conexion("SELECT * FROM criptomonedas ORDER BY Fecha DESC, Hora DESC")
     rows = con.fetch_all()
     con.close()
     return rows
-
 
 def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to):
     con = Conexion(
@@ -20,7 +16,6 @@ def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantid
         (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to)
     )
     con.close()
-
 
 def calcular_saldo(moneda):
     con = Conexion(
@@ -33,7 +28,6 @@ def calcular_saldo(moneda):
     saldo = con.res.fetchone()[0] or 0
     con.close()
     return saldo
-
 
 def obtener_monedas_con_saldo():
     con = Conexion("""
@@ -48,20 +42,47 @@ def obtener_monedas_con_saldo():
     """)
     resultados = con.fetch_all()
     con.close()
-    # Ajustar extracción para lista de diccionarios o tuplas:
     monedas = [row['moneda'] if isinstance(row, dict) else row[0] for row in resultados]
-
-    # Aseguramos que 'EUR' siempre esté en la lista y al inicio
+    
     if "EUR" not in monedas:
         monedas.insert(0, "EUR")
     else:
-        # Lo movemos al inicio si está en otra posición
         monedas = ["EUR"] + [m for m in monedas if m != "EUR"]
     return monedas
 
 def obtener_todas_criptomonedas():
-    # Lista fija o dinámica, aquí un ejemplo fijo de 20 monedas + EUR
-    return ['BTC', 'ETH', 'BNB', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'LTC', 'DOGE', 
+    return ['BTC', 'ETH', 'BNB', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'LTC', 'DOGE',
             'AVAX', 'SHIB', 'MATIC', 'TRX', 'UNI', 'ATOM', 'LINK', 'XLM', 'BCH', 'VET', 'EUR']
 
+def total_euros_invertidos():
+    con = Conexion("""
+        SELECT SUM(Cantidad_From)
+        FROM criptomonedas
+        WHERE Moneda_From = 'EUR'
+    """)
+    total = con.res.fetchone()[0] or 0
+    con.close()
+    return total
 
+def calcular_beneficio():
+    con = Conexion("""
+        SELECT SUM(Cantidad_To)
+        FROM criptomonedas
+        WHERE Moneda_To = 'EUR'
+    """)
+    ventas = con.res.fetchone()[0] or 0
+    con.close()
+    return ventas - total_euros_invertidos()
+
+def valor_total_en_euro():
+    monedas = obtener_monedas_con_saldo()
+    total = 0
+    for moneda in monedas:
+        if moneda != "EUR":
+            url = f"https://rest.coinapi.io/v1/exchangerate/{moneda}/EUR"
+            headers = {'X-CoinAPI-Key': COINAPI_KEY}
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                tasa = response.json().get("rate", 0)
+                total += calcular_saldo(moneda) * tasa
+    return total

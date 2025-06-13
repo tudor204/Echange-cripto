@@ -1,6 +1,58 @@
 {% extends "base.html" %}
 
 {% block section %}
-<h2>Estado de la Inversión</h2>
+<section class="card">
+  <h2>Estado de la Inversión</h2>
+  
+  <div class="grid">
+    <div class="metric">
+      <h3>Total Invertido</h3>
+      <p class="value">{{ "%.2f"|format(inversion) }} EUR</p>
+    </div>
+    
+    <div class="metric">
+      <h3>Beneficio/Pérdida</h3>
+      <p class="value {% if beneficio >= 0 %}positive{% else %}negative{% endif %}">
+        {{ "%.2f"|format(beneficio) }} EUR
+      </p>
+    </div>
+    
+    <div class="metric">
+      <h3>Valor Actual</h3>
+      <p class="value">{{ "%.2f"|format(valor_criptos) }} EUR</p>
+    </div>
+  </div>
+</section>
 
+<style>
+  .card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .metric {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0 0;
+  }
+  
+  .positive { color: #10b981; }
+  .negative { color: #ef4444; }
+</style>
 {% endblock %}
