@@ -1,6 +1,7 @@
 import requests
 from .conexion import Conexion
 from app import COINAPI_KEY
+from config import *
 
 def select_all():
     con = Conexion("SELECT * FROM criptomonedas ORDER BY Fecha DESC, Hora DESC")
@@ -51,8 +52,7 @@ def obtener_monedas_con_saldo():
     return monedas
 
 def obtener_todas_criptomonedas():
-    return ['BTC', 'ETH', 'BNB', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'LTC', 'DOGE',
-            'AVAX', 'SHIB', 'MATIC', 'TRX', 'UNI', 'ATOM', 'LINK', 'XLM', 'BCH', 'VET', 'EUR']
+    return CRYPTO_LIST
 
 def total_euros_invertidos():
     con = Conexion("""

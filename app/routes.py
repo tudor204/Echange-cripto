@@ -4,13 +4,6 @@ from app import app
 from app.models import *
 import requests
 
-ICONOS_CRIPTOS = {
-    'BTC': 'btc.svg', 'ETH': 'eth.svg', 'USDT': 'usdt.svg', 'BNB': 'bnb.svg',
-    'ADA': 'ada.svg', 'XRP': 'xrp.svg', 'SOL': 'sol.svg', 'DOT': 'dot.svg',
-    'DOGE': 'doge.svg', 'LTC': 'ltc.svg', 'AVAX': 'avax.svg', 'SHIB': 'shib.svg',
-    'LINK': 'link.svg', 'MATIC': 'matic.svg', 'UNI': 'uni.svg', 'XLM': 'xlm.svg',
-    'ATOM': 'atom.svg', 'ETC': 'etc.svg', 'TRX': 'trx.svg', 'EUR': 'eur.svg'
-}
 
 @app.route("/")
 def index():
@@ -24,7 +17,7 @@ def purchase():
 
     if not monedas_con_saldo:
         monedas_from = ['EUR']
-        monedas_to = [c for c in todas_criptos if c != 'EUR']
+        monedas_to = ['BTC']  # Solo permitir BTC si no hay saldo
     else:
         monedas_from = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']
         monedas_to = ['EUR'] + [c for c in todas_criptos if c not in monedas_from]
@@ -33,11 +26,27 @@ def purchase():
         accion = request.form.get("accion")
         moneda_from = request.form.get("from_currency")
         moneda_to = request.form.get("to_currency")
-        
+
         try:
             cantidad_from = float(request.form.get("amount", 0))
         except ValueError:
             flash("Cantidad inválida", "error")
+            return redirect("/purchase")
+
+        # ✅ Validar combinaciones permitidas
+        if moneda_from == "EUR":
+            if moneda_to != "BTC":
+                flash("Solo puedes comprar BTC con euros", "error")
+                return redirect("/purchase")
+        elif moneda_from == "BTC":
+            # BTC → EUR o BTC → otra cripto está permitido
+            pass
+        elif moneda_from != "EUR":
+            if moneda_to == "EUR":
+                flash("No puedes vender otras criptomonedas por euros directamente", "error")
+                return redirect("/purchase")
+        else:
+            flash("Combinación no permitida", "error")
             return redirect("/purchase")
 
         if accion == "calcular":
@@ -88,9 +97,46 @@ def purchase():
         accion='inicio'
     )
 
+
 @app.route("/status")
 def status():
+    # 1. Invertido = suma de Cantidad_From donde Moneda_From = EUR
+    invertido = total_euros_invertidos()
+
+    # 2. Recuperado = suma de Cantidad_To donde Moneda_To = EUR
+    recuperado = calcular_beneficio() + invertido  # ya tienes ventas - invertido = beneficio
+    # Por tanto recuperado = beneficio + invertido = recuperado total
+
+    # 3. Valor de compra = invertido - recuperado
+    valor_compra = invertido - recuperado
+
+    # 4. Calcular saldo por cripto
+    monedas = [m for m in obtener_monedas_con_saldo() if m != "EUR"]
+    saldo_por_moneda = {m: calcular_saldo(m) for m in monedas}
+
+    # 5. Obtener valor actual en EUR por cada cripto
+    total_actual = 0
+    cripto_valores = {}
+    for m, saldo in saldo_por_moneda.items():
+        url = f"https://rest.coinapi.io/v1/exchangerate/{m}/EUR"
+        headers = {'X-CoinAPI-Key': COINAPI_KEY}
+        resp = requests.get(url, headers=headers, timeout=5)
+        if resp.status_code == 200:
+            tasa = resp.json().get("rate", 0)
+            euros = saldo * tasa
+        else:
+            tasa = 0
+            euros = 0
+        cripto_valores[m] = {"saldo": saldo, "tasa": tasa, "euros": euros}
+        total_actual += euros
+
+    ganancia_perdida = total_actual - valor_compra
+
     return render_template("status.html",
-        inversion=total_euros_invertidos(),
-        beneficio=calcular_beneficio(),
-        valor_criptos=valor_total_en_euro())
+        invertido=invertido,
+        recuperado=recuperado,
+        valor_compra=valor_compra,
+        cripto_valores=cripto_valores,
+        total_actual=total_actual,
+        ganancia_perdida=ganancia_perdida
+    )

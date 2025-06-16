@@ -2,26 +2,25 @@
 
 {% block section %}
 <section class="card">
-  <h2>Estado de la Inversión</h2>
-  
-  <div class="grid">
-    <div class="metric">
-      <h3>Total Invertido</h3>
-      <p class="value">{{ "%.2f"|format(inversion) }} EUR</p>
-    </div>
-    
-    <div class="metric">
-      <h3>Beneficio/Pérdida</h3>
-      <p class="value {% if beneficio >= 0 %}positive{% else %}negative{% endif %}">
-        {{ "%.2f"|format(beneficio) }} EUR
-      </p>
-    </div>
-    
-    <div class="metric">
-      <h3>Valor Actual</h3>
-      <p class="value">{{ "%.2f"|format(valor_criptos) }} EUR</p>
-    </div>
-  </div>
+  <ul>
+  <li><strong>Invertido:</strong> {{ invertido }}EUR</li>
+  <li><strong>Recuperado:</strong> {{ recuperado }}EUR</li>
+  <li><strong>Valor de compra:</strong> {{ valor_compra }}EUR</li>
+  <li><strong>Valor actual:</strong> {{ total_actual }}EUR</li>
+  <li>
+    <strong>Ganancia/Pérdida:</strong>
+    <span style="color: {{ 'green' if ganancia_perdida>=0 else 'red' }}">
+      {{ ganancia_perdida }}EUR
+    </span>
+  </li>
+</ul>
+
+<h3>Detalle criptos:</h3>
+<ul>
+  {% for m, info in cripto_valores.items() %}
+    <li>{{ m }}: {{ info.saldo }} unidades × {{ info.tasa }} EUR = {{ info.euros }}EUR</li>
+  {% endfor %}
+</ul>
 </section>
 
 <style>
