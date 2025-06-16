@@ -41,24 +41,24 @@
         <td>{{ mov['Hora'] }}</td>
 
         <td>
-          {% set from_symbol = mov['Moneda_from']|lower %}
+          {% set from_symbol = mov['Moneda_From']|lower %}
           {% if icon_map[from_symbol] %}
             <img src="{{ icon_base ~ icon_map[from_symbol] }}" alt="{{ from_symbol }}" class="crypto-icon">
           {% endif %}
-          {{ mov['Moneda_from'] }}
+          {{ mov['Moneda_From'] }}
         </td>
 
-        <td>{{ mov['Cantidad_from'] }}</td>
+        <td>{{ mov['Cantidad_From'] }}</td>
 
         <td>
-          {% set to_symbol = mov['Moneda_to']|lower %}
+          {% set to_symbol = mov['Moneda_To']|lower %}
           {% if icon_map[to_symbol] %}
             <img src="{{ icon_base ~ icon_map[to_symbol] }}" alt="{{ to_symbol }}" class="crypto-icon">
           {% endif %}
-          {{ mov['Moneda_to'] }}
+          {{ mov['Moneda_To'] }}
         </td>
 
-        <td>{{ mov['Cantidad_to'] }}</td>
+        <td>{{ mov['Cantidad_To'] }}</td>
         <td>{{ mov['Precio_unitario'] }}</td>
       </tr>
       {% else %}
