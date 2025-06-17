@@ -65,15 +65,11 @@ def total_euros_invertidos():
     con.close()
     return total
 
-def calcular_beneficio():
-    con = Conexion("""
-        SELECT SUM(Cantidad_To)
-        FROM criptomonedas
-        WHERE Moneda_To = 'EUR'
-    """)
+def calcular_ventas():
+    con = Conexion("SELECT SUM(Cantidad_To) FROM criptomonedas WHERE Moneda_To = 'EUR'")
     ventas = con.res.fetchone()[0] or 0
     con.close()
-    return ventas - total_euros_invertidos()
+    return ventas
 
 def valor_total_en_euro():
     monedas = obtener_monedas_con_saldo()

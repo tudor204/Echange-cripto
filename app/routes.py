@@ -132,20 +132,24 @@ def status():
     # 1. Invertido = suma de Cantidad_From donde Moneda_From = EUR
     invertido = total_euros_invertidos()
 
-    # 2. Recuperado = suma de Cantidad_To donde Moneda_To = EUR
-    recuperado = calcular_beneficio() + invertido  # ya tienes ventas - invertido = beneficio
-    # Por tanto recuperado = beneficio + invertido = recuperado total
+    # 2. Recuperado = suma de Cantidad_To donde Moneda_To = EUR (CORRECCIÓN CLAVE)
+    con = Conexion("""
+        SELECT SUM(Cantidad_To) as total
+        FROM criptomonedas
+        WHERE Moneda_To = 'EUR'
+    """)
+    recuperado = con.res.fetchone()[0] or 0  # Si es None, usa 0
+    con.close()
 
     # 3. Valor de compra = invertido - recuperado
     valor_compra = invertido - recuperado
 
-    # 4. Calcular saldo por cripto
+    # 4. Valor actual (sin cambios, está correcto)
     monedas = [m for m in obtener_monedas_con_saldo() if m != "EUR"]
     saldo_por_moneda = {m: calcular_saldo(m) for m in monedas}
-
-    # 5. Obtener valor actual en EUR por cada cripto
     total_actual = 0
     cripto_valores = {}
+    
     for m, saldo in saldo_por_moneda.items():
         url = f"https://rest.coinapi.io/v1/exchangerate/{m}/EUR"
         headers = {'X-CoinAPI-Key': COINAPI_KEY}
@@ -168,4 +172,4 @@ def status():
         cripto_valores=cripto_valores,
         total_actual=total_actual,
         ganancia_perdida=ganancia_perdida
-    )
+    ) 
