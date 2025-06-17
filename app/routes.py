@@ -13,53 +13,90 @@ def index():
 @app.route("/purchase", methods=["GET", "POST"])
 def purchase():
     monedas_con_saldo = obtener_monedas_con_saldo()
-    todas_criptos = obtener_todas_criptomonedas()
+    monedas_from_display = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']
+    todas_las_criptos_disponibles = CRYPTO_LIST
 
-    # Actualización para permitir comprar BTC siempre desde EUR
-    if not monedas_con_saldo:
-        monedas_from = ['EUR']
-        monedas_to = ['BTC']  # Solo permitir BTC si no hay saldo
-    else:
-        monedas_from = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']
-        monedas_to = [c for c in todas_criptos if c not in monedas_from]
-
-    # Aseguramos que BTC esté siempre en monedas_to para compra desde EUR
-    if 'BTC' not in monedas_to:
-        monedas_to.append('BTC')
-    
-    # Si vendemos BTC, queremos que EUR esté disponible para comprar
-    if 'BTC' in monedas_from and 'EUR' not in monedas_to:
-        monedas_to.append('EUR')
-
+    # --- Inicializar variables que podrían no existir ---
+    cantidad_to = None # O 0.0, dependiendo de cómo quieras mostrarlo
+    tasa_cambio = None # O 0.0
+    moneda_from = request.form.get("from_currency") if request.method == "POST" else None
+    moneda_to = request.form.get("to_currency") if request.method == "POST" else None
+    cantidad_from = float(request.form.get("amount", 0)) if request.method == "POST" else None
+    # --- Fin de inicialización ---
 
     if request.method == "POST":
         accion = request.form.get("accion")
-        moneda_from = request.form.get("from_currency")
-        moneda_to = request.form.get("to_currency")
+        moneda_from = request.form.get("from_currency") # Reasignar si es POST
+        moneda_to = request.form.get("to_currency")     # Reasignar si es POST
 
         try:
             cantidad_from = float(request.form.get("amount", 0))
         except ValueError:
-            flash("Cantidad inválida", "error")
-            return redirect("/purchase")
+            flash("Cantidad inválida. Por favor, introduce un número válido.", "error")
+            # En caso de error, renderizar con los datos disponibles
+            return render_template("purchase.html",
+                monedas_from=monedas_from_display,
+                todas_criptos=todas_las_criptos_disponibles,
+                moneda_from=moneda_from, # Mantener la selección inválida
+                moneda_to=moneda_to,     # Mantener la selección inválida
+                cantidad_from=cantidad_from,
+                cantidad_to=cantidad_to, # Será None/0
+                tasa_cambio=tasa_cambio, # Será None/0
+                accion='inicio' # O 'calcular' si venía de un cálculo previo
+            )
 
-        # Validaciones de combinaciones no permitidas
-
+        # Validaciones de combinaciones no permitidas (estas se mantienen)
         if moneda_from == moneda_to:
-            flash("No puedes operar con la misma criptomoneda como origen y destino.", "error")
-            return redirect("/purchase")
+            flash("No puedes operar con la misma criptomoneda como origen y destino. Selecciona monedas diferentes.", "error")
+            return render_template("purchase.html",
+                monedas_from=monedas_from_display,
+                todas_criptos=todas_las_criptos_disponibles,
+                moneda_from=moneda_from,
+                moneda_to=moneda_to,
+                cantidad_from=cantidad_from,
+                cantidad_to=cantidad_to, # Será None/0
+                tasa_cambio=tasa_cambio, # Será None/0
+                accion='inicio'
+            )
 
         if moneda_from == "EUR" and moneda_to != "BTC":
-            flash("Solo puedes comprar BTC directamente con euros. Si deseas otra criptomoneda, primero compra BTC.", "error")
-            return redirect("/purchase")
+            flash("Para comprar criptomonedas con euros, solo puedes adquirir Bitcoin (BTC) directamente. Si deseas otra criptomoneda, te recomendamos comprar BTC y luego intercambiarlo.", "error")
+            return render_template("purchase.html",
+                monedas_from=monedas_from_display,
+                todas_criptos=todas_las_criptos_disponibles,
+                moneda_from=moneda_from,
+                moneda_to=moneda_to,
+                cantidad_from=cantidad_from,
+                cantidad_to=cantidad_to, # Será None/0
+                tasa_cambio=tasa_cambio, # Será None/0
+                accion='inicio'
+            )
 
         if moneda_from != "EUR" and moneda_to == "EUR" and moneda_from != "BTC":
-            flash(f"No puedes vender {moneda_from} directamente por euros. Convierte primero a BTC.", "error")
-            return redirect("/purchase")
+            flash(f"Operación no permitida: No puedes vender {moneda_from} directamente a EUR. Nuestro sistema requiere que todas las ventas a Euros se realicen desde Bitcoin (BTC). Por favor, convierte tus {moneda_from} a BTC primero.", "error")
+            return render_template("purchase.html",
+                monedas_from=monedas_from_display,
+                todas_criptos=todas_las_criptos_disponibles,
+                moneda_from=moneda_from,
+                moneda_to=moneda_to,
+                cantidad_from=cantidad_from,
+                cantidad_to=cantidad_to, # Será None/0
+                tasa_cambio=tasa_cambio, # Será None/0
+                accion='inicio'
+            )
 
-        if moneda_from not in monedas_from or moneda_to not in monedas_to:
+        if moneda_from not in monedas_from_display or moneda_to not in todas_las_criptos_disponibles:
             flash("La combinación seleccionada no está permitida. Revisa las opciones disponibles.", "error")
-            return redirect("/purchase")
+            return render_template("purchase.html",
+                monedas_from=monedas_from_display,
+                todas_criptos=todas_las_criptos_disponibles,
+                moneda_from=moneda_from,
+                moneda_to=moneda_to,
+                cantidad_from=cantidad_from,
+                cantidad_to=cantidad_to, # Será None/0
+                tasa_cambio=tasa_cambio, # Será None/0
+                accion='inicio'
+            )
 
         # Acción: calcular tasa
         if accion == "calcular":
@@ -69,36 +106,80 @@ def purchase():
 
             if response.status_code == 200:
                 data = response.json()
-                tasa_cambio = data.get("rate")
+                tasa_cambio = data.get("rate") # Ahora tasa_cambio se asigna aquí
                 if not tasa_cambio:
-                    flash("No se pudo obtener la tasa de cambio", "error")
-                    return redirect("/purchase")
+                    flash("No se pudo obtener la tasa de cambio para esta operación.", "error")
+                    return render_template("purchase.html",
+                        monedas_from=monedas_from_display,
+                        todas_criptos=todas_las_criptos_disponibles,
+                        moneda_from=moneda_from,
+                        moneda_to=moneda_to,
+                        cantidad_from=cantidad_from,
+                        cantidad_to=None, # Resetear o mantener None si no se calculó
+                        tasa_cambio=None, # Resetear o mantener None si no se calculó
+                        accion='inicio'
+                    )
 
-                cantidad_to = cantidad_from * tasa_cambio
+                cantidad_to = cantidad_from * tasa_cambio # Ahora cantidad_to se asigna aquí
 
                 return render_template("purchase.html",
-                    monedas_from=monedas_from,
-                    monedas_to=monedas_to,
+                    monedas_from=monedas_from_display,
+                    todas_criptos=todas_las_criptos_disponibles,
                     moneda_from=moneda_from,
                     moneda_to=moneda_to,
                     cantidad_from=cantidad_from,
-                    cantidad_to=cantidad_to,
-                    tasa_cambio=tasa_cambio,
+                    cantidad_to=cantidad_to, # Ahora definida
+                    tasa_cambio=tasa_cambio, # Ahora definida
                     accion='calcular'
                 )
             else:
-                flash(f"Error al consultar la API: {response.status_code}", "error")
-                return redirect("/purchase")
+                flash(f"Error al consultar la API de tasas de cambio: {response.status_code}. Inténtalo de nuevo más tarde.", "error")
+                return render_template("purchase.html",
+                    monedas_from=monedas_from_display,
+                    todas_criptos=todas_las_criptos_disponibles,
+                    moneda_from=moneda_from,
+                    moneda_to=moneda_to,
+                    cantidad_from=cantidad_from,
+                    cantidad_to=None,
+                    tasa_cambio=None,
+                    accion='inicio'
+                )
 
         # Acción: validar y guardar operación
         elif accion == "validar":
             if moneda_from != "EUR":
                 saldo = calcular_saldo(moneda_from)
-                if saldo < cantidad_from:
-                    flash(f"Saldo insuficiente. Disponible: {saldo:.6f} {moneda_from}", "error")
-                    return redirect("/purchase")
+                # routes.py (dentro de elif accion == "validar":)
 
-            cantidad_to = float(request.form.get("cantidad_to", 0))
+# ... (tu código anterior) ...
+
+                cantidad_to = float(request.form.get("cantidad_to", 0))
+                # Recuperar la tasa_cambio del campo oculto. Si no está (ej. validación inicial GET), usa None o 0.0
+                tasa_cambio = float(request.form.get("tasa_cambio_oculto", 0)) # Asegurarse de que sea float
+
+
+                if moneda_from != "EUR":
+                    saldo = calcular_saldo(moneda_from)
+                    # cantidad_to ya se obtuvo de request.form.get("cantidad_to", 0)
+
+                    if saldo < cantidad_from:
+                        flash(f"Saldo insuficiente. Disponible: {saldo:.6f} {moneda_from}. No puedes operar con más de lo que posees.", "error")
+                        return render_template("purchase.html",
+                            monedas_from=monedas_from_display,
+                            todas_criptos=todas_las_criptos_disponibles,
+                            moneda_from=moneda_from,
+                            moneda_to=moneda_to,
+                            cantidad_from=cantidad_from,
+                            cantidad_to=cantidad_to, # Ahora definida
+                            tasa_cambio=tasa_cambio, # ¡Ahora definida y recuperada del formulario!
+                            accion='calcular' # Mantener el estado 'calcular'
+                        )
+
+
+                
+
+            cantidad_to = float(request.form.get("cantidad_to", 0)) # Obtener cantidad_to del campo oculto
+
             fecha_actual = datetime.now().strftime("%Y-%m-%d")
             hora_actual = datetime.now().strftime("%H:%M:%S")
 
@@ -114,16 +195,20 @@ def purchase():
                 precio_unitario
             )
 
-            flash("Operación registrada correctamente", "success")
+            flash("Operación registrada correctamente. ¡Éxito!", "success")
             return redirect("/")
 
-    # GET o después de errores
+    # GET o cualquier otro caso donde no se haya hecho un POST 'calcular' o 'validar' exitoso
     return render_template("purchase.html",
-        monedas_from=monedas_from,
-        monedas_to=monedas_to,
+        monedas_from=monedas_from_display,
+        todas_criptos=todas_las_criptos_disponibles,
+        moneda_from=moneda_from if moneda_from else 'EUR', # Si es GET, selecciona EUR por defecto
+        moneda_to=moneda_to if moneda_to else 'BTC', # Si es GET, selecciona BTC por defecto
+        cantidad_from=cantidad_from,
+        cantidad_to=cantidad_to, # Será None/0
+        tasa_cambio=tasa_cambio, # Será None/0
         accion='inicio'
     )
-
 
 
 
