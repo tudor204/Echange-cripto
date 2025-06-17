@@ -9,14 +9,15 @@ def select_all():
     con.close()
     return rows
 
-def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to):
+def insert_movimiento(fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to, precio_unitario):
     con = Conexion(
         """INSERT INTO criptomonedas 
-           (Fecha, Hora, Moneda_From, Cantidad_From, Moneda_To, Cantidad_To)
-           VALUES (?, ?, ?, ?, ?, ?)""",
-        (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to)
+           (Fecha, Hora, Moneda_From, Cantidad_From, Moneda_To, Cantidad_To, Precio_unitario)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to, precio_unitario)
     )
     con.close()
+
 
 def calcular_saldo(moneda):
     con = Conexion(

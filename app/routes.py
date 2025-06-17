@@ -87,7 +87,20 @@ def purchase():
             cantidad_to = float(request.form.get("cantidad_to", 0))
             fecha_actual = datetime.now().strftime("%Y-%m-%d")
             hora_actual = datetime.now().strftime("%H:%M:%S")
-            insert_movimiento(fecha_actual, hora_actual, moneda_from, cantidad_from, moneda_to, cantidad_to)
+
+            # ✅ Nuevo cálculo del precio unitario
+            precio_unitario = cantidad_from / cantidad_to if cantidad_to != 0 else 0
+
+            insert_movimiento(
+                fecha_actual,
+                hora_actual,
+                moneda_from,
+                cantidad_from,
+                moneda_to,
+                cantidad_to,
+                precio_unitario
+            )
+
             flash("Operación registrada", "success")
             return redirect("/")
 
@@ -96,6 +109,7 @@ def purchase():
         monedas_to=monedas_to,
         accion='inicio'
     )
+
 
 
 @app.route("/status")

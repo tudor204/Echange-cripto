@@ -3,25 +3,27 @@
 {% block section %}
 <section class="card">
   <ul>
-  <li><strong>Invertido:</strong> {{ invertido }}EUR</li>
-  <li><strong>Recuperado:</strong> {{ recuperado }}EUR</li>
-  <li><strong>Valor de compra:</strong> {{ valor_compra }}EUR</li>
-  <li><strong>Valor actual:</strong> {{ total_actual }}EUR</li>
-  <li>
-    <strong>Ganancia/Pérdida:</strong>
-    <span style="color: {{ 'green' if ganancia_perdida>=0 else 'red' }}">
-      {{ ganancia_perdida }}EUR
-    </span>
-  </li>
-</ul>
+    <li><strong>Invertido:</strong> {{ '%.2f' % invertido }} EUR</li>
+    <li><strong>Recuperado:</strong> {{ '%.2f' % recuperado }} EUR</li>
+    <li><strong>Valor de compra:</strong> {{ '%.2f' % valor_compra }} EUR</li>
+    <li><strong>Valor actual:</strong> {{ '%.2f' % total_actual }} EUR</li>
+    <li>
+      <strong>Ganancia/Pérdida:</strong>
+      <span style="color: {{ 'green' if ganancia_perdida >= 0 else 'red' }}">
+        {{ '%.2f' % ganancia_perdida }} EUR
+      </span>
+    </li>
+  </ul>
 
-<h3>Detalle criptos:</h3>
-<ul>
-  {% for m, info in cripto_valores.items() %}
-    <li>{{ m }}: {{ info.saldo }} unidades × {{ info.tasa }} EUR = {{ info.euros }}EUR</li>
-  {% endfor %}
-</ul>
+  <h3>Detalle criptos:</h3>
+  <ul>
+    {% for m, info in cripto_valores.items() %}
+      <li>{{ m }}: {{ '%.6f' % info.saldo }} unidades × {{ '%.2f' % info.tasa }} EUR = {{ '%.2f' % info.euros }} EUR</li>
+    {% endfor %}
+  </ul>
 </section>
+{% endblock %}
+
 
 <style>
   .card {
@@ -54,4 +56,3 @@
   .positive { color: #10b981; }
   .negative { color: #ef4444; }
 </style>
-{% endblock %}
