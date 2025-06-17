@@ -15,12 +15,22 @@ def purchase():
     monedas_con_saldo = obtener_monedas_con_saldo()
     todas_criptos = obtener_todas_criptomonedas()
 
+    # Actualización para permitir comprar BTC siempre desde EUR
     if not monedas_con_saldo:
         monedas_from = ['EUR']
         monedas_to = ['BTC']  # Solo permitir BTC si no hay saldo
     else:
         monedas_from = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']
-        monedas_to = ['EUR'] + [c for c in todas_criptos if c not in monedas_from]
+        monedas_to = [c for c in todas_criptos if c not in monedas_from]
+
+    # Aseguramos que BTC esté siempre en monedas_to para compra desde EUR
+    if 'BTC' not in monedas_to:
+        monedas_to.append('BTC')
+    
+    # Si vendemos BTC, queremos que EUR esté disponible para comprar
+    if 'BTC' in monedas_from and 'EUR' not in monedas_to:
+        monedas_to.append('EUR')
+
 
     if request.method == "POST":
         accion = request.form.get("accion")
@@ -33,22 +43,25 @@ def purchase():
             flash("Cantidad inválida", "error")
             return redirect("/purchase")
 
-        # ✅ Validar combinaciones permitidas
-        if moneda_from == "EUR":
-            if moneda_to != "BTC":
-                flash("Solo puedes comprar BTC con euros", "error")
-                return redirect("/purchase")
-        elif moneda_from == "BTC":
-            # BTC → EUR o BTC → otra cripto está permitido
-            pass
-        elif moneda_from != "EUR":
-            if moneda_to == "EUR":
-                flash("No puedes vender otras criptomonedas por euros directamente", "error")
-                return redirect("/purchase")
-        else:
-            flash("Combinación no permitida", "error")
+        # Validaciones de combinaciones no permitidas
+
+        if moneda_from == moneda_to:
+            flash("No puedes operar con la misma criptomoneda como origen y destino.", "error")
             return redirect("/purchase")
 
+        if moneda_from == "EUR" and moneda_to != "BTC":
+            flash("Solo puedes comprar BTC directamente con euros. Si deseas otra criptomoneda, primero compra BTC.", "error")
+            return redirect("/purchase")
+
+        if moneda_from != "EUR" and moneda_to == "EUR" and moneda_from != "BTC":
+            flash(f"No puedes vender {moneda_from} directamente por euros. Convierte primero a BTC.", "error")
+            return redirect("/purchase")
+
+        if moneda_from not in monedas_from or moneda_to not in monedas_to:
+            flash("La combinación seleccionada no está permitida. Revisa las opciones disponibles.", "error")
+            return redirect("/purchase")
+
+        # Acción: calcular tasa
         if accion == "calcular":
             url = f"https://rest.coinapi.io/v1/exchangerate/{moneda_from}/{moneda_to}"
             headers = {'X-CoinAPI-Key': COINAPI_KEY}
@@ -58,7 +71,7 @@ def purchase():
                 data = response.json()
                 tasa_cambio = data.get("rate")
                 if not tasa_cambio:
-                    flash("No se pudo obtener la tasa", "error")
+                    flash("No se pudo obtener la tasa de cambio", "error")
                     return redirect("/purchase")
 
                 cantidad_to = cantidad_from * tasa_cambio
@@ -74,21 +87,21 @@ def purchase():
                     accion='calcular'
                 )
             else:
-                flash(f"Error API: {response.status_code}", "error")
+                flash(f"Error al consultar la API: {response.status_code}", "error")
                 return redirect("/purchase")
 
+        # Acción: validar y guardar operación
         elif accion == "validar":
             if moneda_from != "EUR":
                 saldo = calcular_saldo(moneda_from)
                 if saldo < cantidad_from:
-                    flash(f"Saldo insuficiente. Disponible: {saldo:.6f}", "error")
+                    flash(f"Saldo insuficiente. Disponible: {saldo:.6f} {moneda_from}", "error")
                     return redirect("/purchase")
 
             cantidad_to = float(request.form.get("cantidad_to", 0))
             fecha_actual = datetime.now().strftime("%Y-%m-%d")
             hora_actual = datetime.now().strftime("%H:%M:%S")
 
-            # ✅ Nuevo cálculo del precio unitario
             precio_unitario = cantidad_from / cantidad_to if cantidad_to != 0 else 0
 
             insert_movimiento(
@@ -101,14 +114,16 @@ def purchase():
                 precio_unitario
             )
 
-            flash("Operación registrada", "success")
+            flash("Operación registrada correctamente", "success")
             return redirect("/")
 
+    # GET o después de errores
     return render_template("purchase.html",
         monedas_from=monedas_from,
         monedas_to=monedas_to,
         accion='inicio'
     )
+
 
 
 

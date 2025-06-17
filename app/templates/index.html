@@ -59,7 +59,7 @@
         </td>
 
         <td>{{ '%.6f' | format(mov['Cantidad_To'] | float) }}</td>
-        <td>{{ '{:,.0f}'.format(mov['Precio_unitario'] | float).replace(',', '.') }}</td>
+        <td>{{ '{:,.5f}'.format(mov['Precio_unitario'] | float).replace(',', '.') }}</td>
 
 
       </tr>

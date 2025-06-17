@@ -23,17 +23,26 @@
   <h2 style="margin-bottom: 0.5rem;">Compra/Venta</h2>
   <p class="subtitle" style="margin-bottom: 1.5rem;">Conversión de criptomonedas</p>
 
+  <!-- Mensajes Flash -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <form method="POST" action="/purchase">
     <div class="form-row">
       <div class="form-group compact">
         <label>De</label>
-        <select name="from_currency" required>
+        <select name="from_currency" >
           {% for moneda in monedas_from %}
           <option value="{{ moneda }}"
-            {% if moneda==moneda_from %}selected
-            {% elif accion=='inicio' and moneda=='EUR' %}selected
+            {% if moneda == moneda_from %}selected
+            {% elif accion == 'inicio' and moneda == 'EUR' %}selected
             {% endif %}>
-            {% if icon_map[moneda|lower] %}
+            {% if icon_map[moneda|lower] is defined %}
             <img src="{{ icon_base ~ icon_map[moneda|lower] }}" alt="{{ moneda }}" class="crypto-icon-sm">
             {% endif %}
             {{ moneda }}
@@ -44,11 +53,11 @@
 
       <div class="form-group compact">
         <label>A</label>
-        <select name="to_currency" required>
+        <select name="to_currency" >
           {% for moneda in monedas_to %}
           <option value="{{ moneda }}"
-            {% if moneda==moneda_to %}selected{% endif %}>
-            {% if icon_map[moneda|lower] %}
+            {% if moneda == moneda_to %}selected{% endif %}>
+            {% if icon_map[moneda|lower] is defined %}
             <img src="{{ icon_base ~ icon_map[moneda|lower] }}" alt="{{ moneda }}" class="crypto-icon-sm">
             {% endif %}
             {{ moneda }}
@@ -60,7 +69,7 @@
 
     <div class="form-group compact">
       <label>Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
-      <input type="number" name="amount" min="0.000001" step="any" required
+      <input type="number" name="amount" min="0.000001" step="any" 
         value="{{ cantidad_from if cantidad_from else '' }}" 
         placeholder="Ej: 1000.00" />
     </div>
@@ -87,11 +96,9 @@
     <button type="submit" name="accion" value="calcular" class="btn-sm primary">Calcular</button>
     {% endif %}
   </form>
-  
 </section>
 
 <style>
-  /*  super Estilos compactos */
   .compact-card {
     max-width: 500px;
     margin: 0 auto;
@@ -191,11 +198,30 @@
     background-color: #f1f5f9;
   }
 
+  .flash-message {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .flash-message.success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+  }
+
+  .flash-message.error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+  }
+
   @media (max-width: 480px) {
     .compact-card {
       padding: 1.25rem;
     }
-    
+
     .form-row {
       flex-direction: column;
       gap: 0.5rem;
