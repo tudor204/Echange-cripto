@@ -2,76 +2,453 @@
 
 {% block section %}
 
-<!-- Diccionario de íconos -->
 {% set icon_base = "https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.17.1/svg/color/" %}
 {% set icon_map = {
-  'btc': 'btc.svg',
-  'eth': 'eth.svg',
-  'usdt': 'usdt.svg',
-  'bnb': 'bnb.svg',
-  'ada': 'ada.svg',
-  'xrp': 'xrp.svg',
-  'sol': 'sol.svg',
-  'dot': 'dot.svg',
-  'ltc': 'ltc.svg',
-  'doge': 'doge.svg',
-  'eur': 'eur.svg',
-  'usd': 'usd.svg'
+    'btc': 'btc.svg', 'eth': 'eth.svg', 'usdt': 'usdt.svg', 'bnb': 'bnb.svg',
+    'ada': 'ada.svg', 'xrp': 'xrp.svg', 'xrp': 'xrp.svg', 'sol': 'sol.svg', 'dot': 'dot.svg',
+    'ltc': 'ltc.svg', 'doge': 'doge.svg', 'eur': 'eur.svg', 'usd': 'usd.svg'
 } %}
 
-<section style="padding: 2rem; background-color: #ffffff; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-  <h2>Historial de Movimientos</h2>
+<section class="main-content-wrapper">
+    <div class="card-header-section">
+        <h2>Historial de Movimientos</h2>
+        <a href="/download_pdf" class="btn-download-pdf">
+            <svg class="icon-download-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Descargar Informe PDF</span>
+        </a>
+    </div>
 
-  <table style="min-width: 850px;">
-    <thead>
-      <tr>
-        <th style="min-width: 140px;">Fecha</th>
-        <th>Hora</th>
-        <th>Moneda usada</th>
-        <th>Cantidad</th>
-        <th>Moneda comprada</th>
-        <th>Cantidad</th>
-        <th>Precio unidad</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for mov in data %}
-      <tr>
-        <td>{{ mov['Fecha'] }}</td>
-        <td>{{ mov['Hora'] }}</td>
+    {% if data %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="column-header">Fecha</th>
+                    <th class="column-header">Hora</th>
+                    <th class="column-header">Moneda Usada</th>
+                    <th class="column-header">Cantidad </th>
+                    <th class="column-header">Moneda Comprada</th>
+                    <th class="column-header">Cantidad Compra</th>
+                    <th class="column-header">P.U</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in data %}
+                <tr>
+                    <td data-label="Fecha">{{ mov['Fecha'] }}</td>
+                    <td data-label="Hora">{{ mov['Hora'] }}</td>
+                    <td data-label="Moneda Usada" class="currency-cell">
+                        {% set from_symbol = mov['Moneda_From']|lower %}
+                        {% if icon_map[from_symbol] %}<img src="{{ icon_base ~ icon_map[from_symbol] }}" alt="{{ from_symbol }}" class="crypto-icon">{% endif %}
+                        <span class="currency-code">{{ mov['Moneda_From'] }}</span>
+                    </td>
+                    <td data-label="Cantidad Usada" class="numeric-value">{{ '%.6f' | format(mov['Cantidad_From']) }}</td>
+                    <td data-label="Moneda Comprada" class="currency-cell">
+                        {% set to_symbol = mov['Moneda_To']|lower %}
+                        {% if icon_map[to_symbol] %}<img src="{{ icon_base ~ icon_map[to_symbol] }}" alt="{{ to_symbol }}" class="crypto-icon">{% endif %}
+                        <span class="currency-code">{{ mov['Moneda_To'] }}</span>
+                    </td>
+                    <td data-label="Cantidad Comprada" class="numeric-value">{{ '%.6f' | format(mov['Cantidad_To'] | float) }}</td>
+                    <td data-label="Precio Unidad" class="numeric-value">{{ '{:,.5f}'.format(mov['Precio_unitario'] | float).replace(',', '.') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state-card">
+        <p class="empty-state-message">Aún no hay movimientos registrados. ¡Comienza a operar para ver tu historial aquí!</p>
+        <a href="/purchase" class="btn-primary-action">Realizar primera operación</a>
+    </div>
+    {% endif %}
 
-        <td>
-          {% set from_symbol = mov['Moneda_From']|lower %}
-          {% if icon_map[from_symbol] %}
-            <img src="{{ icon_base ~ icon_map[from_symbol] }}" alt="{{ from_symbol }}" class="crypto-icon">
-          {% endif %}
-          {{ mov['Moneda_From'] }}
-        </td>
-
-        <td>{{ mov['Cantidad_From'] }}</td>
-
-        <td>
-          {% set to_symbol = mov['Moneda_To']|lower %}
-          {% if icon_map[to_symbol] %}
-            <img src="{{ icon_base ~ icon_map[to_symbol] }}" alt="{{ to_symbol }}" class="crypto-icon">
-          {% endif %}
-          {{ mov['Moneda_To'] }}
-        </td>
-
-        <td>{{ '%.6f' | format(mov['Cantidad_To'] | float) }}</td>
-        <td>{{ '{:,.5f}'.format(mov['Precio_unitario'] | float).replace(',', '.') }}</td>
-
-
-      </tr>
-      {% else %}
-      <tr>
-        <td colspan="7" style="text-align: center; font-style: italic; color: #777;">
-          No hay movimientos registrados.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
 </section>
+
+<style>
+    /* Google Fonts Import (Asegúrate de que esto esté en tu base.html o aquí) */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+    /* Variables de Color (para fácil gestión de la paleta) */
+    :root {
+        --primary-blue: #007bff;
+        --dark-blue: #0056b3;
+        --secondary-green: #28a745;
+        --dark-green: #218838;
+        --light-bg: #f4f7fa;
+        --card-bg: #ffffff;
+        --text-dark: #343a40;
+        --text-medium: #6c757d;
+        --border-light: #e9ecef;
+        --header-bg: #eef2f7; /* Fondo más claro para encabezados */
+        --accent-purple: #6f42c1;
+        --hover-row: #f8fbfd;
+        --table-header-font: #495057; /* Color de fuente más específico para encabezados */
+    }
+
+    /* Reset y Tipografía base */
+    body {
+        font-family: 'Poppins', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: var(--text-dark);
+        line-height: 1.6;
+        background-color: var(--light-bg);
+    }
+
+    /* Contenedor principal de la sección */
+    .main-content-wrapper {
+        padding: 30px;
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin: 30px auto;
+        max-width: 1300px; /* Aumentado a 1300px para más espacio */
+        box-sizing: border-box;
+    }
+
+    /* Encabezado de la sección con botón */
+    .card-header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .card-header-section h2 {
+        font-size: 2.2rem;
+        color: var(--text-dark);
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+    }
+
+    /* Botón de Descarga PDF - Mejorado y llamativo */
+    .btn-download-pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(45deg, var(--accent-purple), #9C27B0); /* Degradado atractivo */
+        color: white;
+        padding: 12px 22px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600; /* Más robusto */
+        font-size: 1rem;
+        transition: all 0.3s ease; /* Transición más suave para todo */
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3); /* Sombra más definida */
+        position: relative; /* Para el pseudo-elemento hover */
+        overflow: hidden; /* Para que el pseudo-elemento no se desborde */
+    }
+
+    .btn-download-pdf::before { /* Efecto de brillo al pasar el mouse */
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: skewX(-20deg);
+        transition: all 0.4s ease;
+    }
+
+    .btn-download-pdf:hover::before {
+        left: 100%;
+    }
+
+    .btn-download-pdf:hover {
+        transform: translateY(-3px); /* Se eleva un poco más */
+        box-shadow: 0 8px 20px rgba(111, 66, 193, 0.4);
+    }
+    .btn-download-pdf:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(111, 66, 193, 0.2);
+    }
+
+    .icon-download-pdf {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2.5;
+    }
+
+    /* Contenedor de la Tabla - clave para el scroll */
+    .table-container {
+        width: 100%;
+        /* overflow-x: auto; /* Deshabilitamos esto para escritorio por ahora, lo activaremos en mobile */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        width: 100%; /* La tabla ocupa el 100% del contenedor */
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        min-width: 900px; /* Mantenemos un min-width para asegurar que el contenido quepa */
+        /* table-layout: fixed; /* Lo deshabilitamos para dar más flexibilidad al contenido */
+    }
+
+    thead th {
+        background-color: var(--header-bg);
+        color: var(--table-header-font);
+        font-weight: 600;
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 2px solid var(--border-light);
+        white-space: nowrap; /* Evita que los encabezados se rompan */
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid var(--border-light);
+        transition: background-color 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background-color: var(--hover-row);
+    }
+
+    tbody td {
+        padding: 10px; /* Padding reducido para ganar espacio */
+        vertical-align: middle;
+        white-space: nowrap; /* Intenta mantener el contenido en una línea */
+        overflow: hidden;
+        text-overflow: ellipsis; /* Puntos suspensivos si el contenido se corta */
+    }
+
+    /* Ajustes específicos para que las celdas contengan su contenido */
+    /* Usamos min-width en lugar de width para dar flexibilidad pero asegurar espacio mínimo */
+    th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Fecha */
+    th:nth-child(2), td:nth-child(2) { min-width: 70px; } /* Hora */
+    th:nth-child(3), td:nth-child(3) { min-width: 140px; } /* Moneda Usada */
+    th:nth-child(4), td:nth-child(4) { min-width: 130px; } /* Cantidad Usada */
+    th:nth-child(5), td:nth-child(5) { min-width: 140px; } /* Moneda Comprada */
+    th:nth-child(6), td:nth-child(6) { min-width: 130px; } /* Cantidad Comprada */
+    th:nth-child(7), td:nth-child(7) { min-width: 150px; } /* Precio Unidad */
+
+
+    /* Asegurar visibilidad de icono + texto en celdas de moneda */
+    .currency-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px; /* Espacio entre icono y texto */
+        /* Desactivamos nowrap, overflow y text-overflow aquí para permitir que todo se vea */
+        white-space: normal; /* Permitir que el texto se envuelva */
+        overflow: visible; /* Asegura que el contenido se vea completo */
+        text-overflow: clip; /* No hay puntos suspensivos */
+        height: auto; /* Ajusta la altura de la celda según el contenido */
+    }
+
+    /* Ajuste para el texto de la moneda si es muy largo, permitir que se trunque dentro de la celda flexible */
+    .currency-cell .currency-code {
+        white-space: nowrap; /* Que el código de moneda no se rompa */
+        overflow: hidden;
+        text-overflow: ellipsis; /* Que el código de moneda se trunque si es muy largo */
+        max-width: calc(100% - 26px); /* Espacio para el icono + gap */
+        display: inline-block; /* Necesario para que max-width y ellipsis funcionen con flex */
+    }
+
+
+    .crypto-icon {
+        min-width: 20px; /* Asegura que el icono no se encoja */
+        height: 20px;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        flex-shrink: 0; /* Evita que el icono se encoja */
+    }
+
+    .currency-code {
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+    }
+
+    .numeric-value {
+        font-family: 'Roboto Mono', monospace;
+        text-align: right;
+        color: var(--text-dark);
+        font-weight: 400;
+        font-size: 0.9rem;
+    }
+
+    /* Estado vacío de la tabla (más estilizado) */
+    .empty-state-card {
+        text-align: center;
+        padding: 60px 20px;
+        background-color: var(--light-bg);
+        border: 2px dashed var(--border-light);
+        border-radius: 10px;
+        margin-top: 30px;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .empty-state-message {
+        font-size: 1.25rem;
+        color: var(--text-medium);
+        margin-bottom: 25px;
+        font-weight: 400;
+    }
+
+    .btn-primary-action {
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    }
+
+    .btn-primary-action:hover {
+        background-color: var(--dark-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    }
+    .btn-primary-action:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    }
+
+    /* Media Queries para Responsividad */
+    @media (max-width: 1300px) { /* Para pantallas que son el max-width o un poco menos */
+        .main-content-wrapper {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+    }
+
+    @media (max-width: 992px) { /* Tabletas */
+        .main-content-wrapper {
+            padding: 25px;
+            margin: 25px auto;
+        }
+        .card-header-section h2 {
+            font-size: 1.9rem;
+        }
+        .btn-download-pdf {
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            gap: 6px;
+        }
+        .icon-download-pdf {
+            width: 18px;
+            height: 18px;
+        }
+        thead th, tbody td {
+            padding: 10px 8px;
+            font-size: 0.85rem;
+        }
+        .crypto-icon {
+            width: 18px;
+            height: 18px;
+        }
+        .numeric-value, .currency-code {
+            font-size: 0.85rem;
+        }
+        /* Activamos el scroll horizontal para tabletas */
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            min-width: 900px; /* Mantenemos el mismo min-width para que sea legible, pero con scroll */
+        }
+    }
+
+    @media (max-width: 768px) { /* Móviles grandes */
+        .main-content-wrapper {
+            padding: 20px;
+            margin: 20px auto;
+        }
+        .card-header-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .card-header-section h2 {
+            font-size: 1.7rem;
+        }
+        .btn-download-pdf {
+            width: 100%;
+            justify-content: center;
+        }
+        table {
+            min-width: 700px; /* Reducimos el min-width para móvil, pero sigue siendo grande */
+        }
+        thead th, tbody td {
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+        .crypto-icon {
+            width: 16px;
+            height: 16px;
+        }
+        .numeric-value, .currency-code {
+            font-size: 0.8rem;
+        }
+        .empty-state-card {
+            padding: 40px 15px;
+        }
+        .empty-state-message {
+            font-size: 1.1rem;
+        }
+        .btn-primary-action {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+        /* En móvil, las celdas de moneda pueden apilar el icono y el texto para ahorrar ancho */
+        .currency-cell {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2px;
+            white-space: normal; /* Permitir envolver el texto */
+            overflow: visible;
+        }
+        .currency-cell .currency-code {
+            white-space: normal; /* Que el código de moneda se envuelva */
+            max-width: 100%; /* No hay restricciones de ancho */
+            text-overflow: clip; /* No hay puntos suspensivos si se envuelve */
+        }
+        .crypto-icon {
+            margin-right: 0; /* Elimina margen derecho */
+        }
+    }
+
+    @media (max-width: 480px) { /* Móviles pequeños */
+        .main-content-wrapper {
+            padding: 15px;
+            margin: 15px auto;
+            border-radius: 8px;
+        }
+        .card-header-section h2 {
+            font-size: 1.5rem;
+        }
+        .btn-download-pdf span {
+            display: none;
+        }
+        .btn-download-pdf {
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            justify-content: center;
+        }
+        .icon-download-pdf {
+            width: 20px;
+            height: 20px;
+        }
+        thead th, tbody td {
+            padding: 6px;
+            font-size: 0.75rem;
+        }
+    }
+</style>
 
 {% endblock %}

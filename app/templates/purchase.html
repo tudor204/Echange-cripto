@@ -2,9 +2,11 @@
 
 {% block section %}
 
-<section class="compact-card">
-    <h2 style="margin-bottom: 0.5rem;">Compra/Venta</h2>
-    <p class="subtitle" style="margin-bottom: 1.5rem;">Conversión de criptomonedas</p>
+<section class="main-content-wrapper">
+    <div class="card-header-section">
+        <h2>Compra/Venta</h2>
+        <p class="subtitle">Conversión de criptomonedas</p>
+    </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -17,16 +19,17 @@
     <p class="small-text help-info">
         <strong>Reglas de Operación:</strong>
         <ul>
-            <li>Para comprar criptomonedas con Euros, solo puedes adquirir **Bitcoin (BTC)** directamente.</li>
-            <li>Para vender criptomonedas a Euros, primero debes convertir tu criptomoneda a **Bitcoin (BTC)**.</li>
-            <li>Puedes intercambiar cualquier criptomoneda que poseas por otra criptomoneda disponible.</li>
+            <li>Puedes **comprar cualquier criptomoneda** con Euros (EUR).</li>
+            <li>Puedes **vender cualquier criptomoneda** a Euros (EUR).</li>
+            <li>Puedes **intercambiar** cualquier criptomoneda que poseas por otra criptomoneda disponible.</li>
+            <li>No puedes operar con la misma criptomoneda como origen y destino.</li>
         </ul>
     </p>
 
     <form method="POST" action="/purchase">
         <div class="form-row">
-            <div class="form-group compact">
-                <label>De</label>
+            <div class="form-group"> {# Quité la clase 'compact' ya no es necesaria con el nuevo flex #}
+                <label for="fromCurrencySelect">De</label>
                 <select name="from_currency" id="fromCurrencySelect">
                     {% for moneda in monedas_from %}
                     <option value="{{ moneda }}"
@@ -39,10 +42,11 @@
                 </select>
             </div>
 
-            <div class="form-group compact">
-                <label>A</label>
+            <div class="form-group"> {# Quité la clase 'compact' #}
+                <label for="toCurrencySelect">A</label>
                 <select name="to_currency" id="toCurrencySelect">
-                    {% for moneda in todas_criptos %} {# ¡IMPORTANTE! Pasar todas las criptos aquí #}
+                    {# IMPORTANTE: Ahora iteramos sobre todas_criptos para permitir cualquier destino #}
+                    {% for moneda in todas_criptos %}
                     <option value="{{ moneda }}"
                         {% if moneda == moneda_to %}selected{% endif %}>
                         {{ moneda }}
@@ -52,116 +56,38 @@
             </div>
         </div>
 
-        <div class="form-group compact">
-            <label>Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
-            <input type="number" name="amount" min="0.000001" step="any"
+        <div class="form-group"> {# Quité la clase 'compact' #}
+            <label for="amountInput">Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
+            <input type="number" name="amount" id="amountInput" min="0.000001" step="any"
                 value="{{ cantidad_from if cantidad_from else '' }}"
                 placeholder="Ej: 1000.00" />
         </div>
 
         {% if accion == 'calcular' %}
-<div class="results">
-    <div class="result-line">
-        <span>Tasa:</span>
-        <span>1 {{ moneda_from }} = {{ "%.6f"|format(tasa_cambio) }} {{ moneda_to }}</span>
-    </div>
-    <div class="result-line highlight">
-        <span>Recibirás:</span>
-        <span>{{ "%.6f"|format(cantidad_to) }} {{ moneda_to }}</span>
-    </div>
+        <div class="results">
+            <div class="result-line">
+                <span>Tasa:</span>
+                <span>1 {{ moneda_from }} = {{ "%.6f"|format(tasa_cambio) }} {{ moneda_to }}</span>
+            </div>
+            <div class="result-line highlight">
+                <span>Recibirás:</span>
+                <span>{{ "%.6f"|format(cantidad_to) }} {{ moneda_to }}</span>
+            </div>
 
-    <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}" />
-    <input type="hidden" name="tasa_cambio_oculto" value="{{ tasa_cambio }}" /> {# ¡NUEVO CAMPO OCULTO! #}
+            <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}" />
+            <input type="hidden" name="tasa_cambio_oculto" value="{{ tasa_cambio }}" />
 
-    <div class="button-row">
-        <button type="submit" name="accion" value="validar" class="btn-sm primary">Validar</button>
-        <button type="submit" name="accion" value="calcular" class="btn-sm secondary">Recalcular</button>
-    </div>
-</div>
-{% else %}
-<button type="submit" name="accion" value="calcular" class="btn-sm primary">Calcular</button>
-{% endif %}
+            <div class="button-row">
+                <button type="submit" name="accion" value="validar" class="btn-sm primary">Validar</button>
+                <button type="submit" name="accion" value="calcular" class="btn-sm secondary">Recalcular</button>
+            </div>
+        </div>
+        {% else %}
+        <button type="submit" name="accion" value="calcular" class="btn-primary-action">Calcular</button> {# Usamos la clase más genérica #}
+        {% endif %}
     </form>
 </section>
 
-<style>
-    .help-info {
-        background-color: #e0f2f7; /* Un azul claro */
-        border-left: 4px solid #2196f3; /* Un borde azul */
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        border-radius: 4px;
-        color: #333;
-        font-size: 0.9em;
-    }
-    .help-info ul {
-        margin: 0.5rem 0 0 1rem;
-        padding: 0;
-        list-style-type: disc;
-    }
-    .help-info li {
-        margin-bottom: 0.3rem;
-    }
-    .help-info strong {
-        color: #0d47a1; /* Un azul más oscuro */
-    }
-</style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const fromSelect = document.getElementById('fromCurrencySelect');
-        const toSelect = document.getElementById('toCurrencySelect');
-
-        // Almacenar las opciones originales de "A"
-        const originalToOptions = Array.from(toSelect.options);
-
-        function updateToOptions() {
-            const selectedFrom = fromSelect.value;
-            toSelect.innerHTML = ''; // Vaciar las opciones actuales de "A"
-
-            let validToOptions = [];
-
-            originalToOptions.forEach(option => {
-                const optionValue = option.value;
-
-                // Regla 1: EUR solo puede comprar BTC
-                if (selectedFrom === 'EUR') {
-                    if (optionValue === 'BTC') {
-                        validToOptions.push(option);
-                    }
-                }
-                // Regla 2: Solo BTC puede venderse a EUR
-                else if (optionValue === 'EUR') {
-                    if (selectedFrom === 'BTC') {
-                        validToOptions.push(option);
-                    }
-                }
-                // Regla 3: Intercambio de cripto a cripto (excluyendo la misma moneda)
-                else if (selectedFrom !== optionValue) {
-                    validToOptions.push(option);
-                }
-            });
-
-            // Añadir las opciones válidas al select "A"
-            validToOptions.forEach(option => {
-                toSelect.add(option.cloneNode(true));
-            });
-
-            // Intentar mantener la selección actual si es válida, o seleccionar la primera opción
-            const currentToValue = "{{ moneda_to }}"; // Valor seleccionado del backend
-            const hasCurrentToOption = Array.from(toSelect.options).some(opt => opt.value === currentToValue);
-
-            if (hasCurrentToOption) {
-                toSelect.value = currentToValue;
-            } else if (toSelect.options.length > 0) {
-                toSelect.selectedIndex = 0; // Selecciona la primera opción disponible
-            }
-        }
-
-        // Ejecutar la función al cargar la página y cuando cambie el selector "De"
-        fromSelect.addEventListener('change', updateToOptions);
-        updateToOptions(); // Llamar al inicio para configurar las opciones basadas en la selección inicial
-    });
-</script>
 
 {% endblock %}

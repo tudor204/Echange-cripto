@@ -1,189 +1,892 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css" />
-  <title>Resumen de Inversiones</title>
-  <style>
-    /* Estilos personalizados que complementan Pico.css */
-    :root {
-      --primary: #3a86ff;
-      --primary-hover: #2667cc;
-      --active-color: #4cc9f0; /* Nuevo color para estado activo */
-    }
-    
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background-color: #f8f9fa;
-    }
-    
-    header {
-      background-color: rgb(184, 233, 240);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      padding: 0.rem 0;
-      position:initial;
-      top: 0;
-      z-index: 100;
-    }
-    
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: bold;
-      color: var(--primary);
-    }
-    
-    .logo-icon {
-      font-size: 1.25rem;
-    }
-    
-    .logo h1 {
-      font-size: 1.25rem;
-      margin: 0;
-    }
-    
-    nav ul {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      gap: 0.5rem;
-    }
-    
-    nav a[role="button"] {
-      transition: all 0.3s ease;
-      border-radius: 50px;
-      padding: 0.4rem 1rem;
-      position: relative;
-      overflow: hidden;
-      font-size: 0.9rem;
-    }
-    
-    /* Estilo para botón activo */
-    nav a[role="button"].active {
-      background-color: var(--active-color);
-      color: white;
-      font-weight: bold;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    
-    /* Efecto hover para botones no activos */
-    nav a[role="button"]:not(.active):hover {
-      background-color: #f1f1f1;
-      transform: translateY(-1px);
-    }
-    
-    /* Indicador adicional para botón activo */
-    nav a[role="button"].active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 2px;
-      background-color: white;
-      border-radius: 2px;
-    }
-    
-    main.container {
-      flex: 1;
-      padding: 1.5rem 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: white;
-      box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
-      margin-top: auto;
-      font-size: 0.85rem;
-    }
-    
-    .crypto-icon {
-      width: 22px;
-      height: 22px;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
-    
-    /* Mejoras para tablas */
-    table {
-      width: 100%;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    
-    th {
-      background-color: var(--primary);
-      color: white;
-      padding: 0.75rem;
-    }
-    
-    /* Responsividad mejorada */
-    @media (max-width: 768px) {
-      .header-container {
-        flex-direction: column;
-        gap: 0.75rem;
-        padding: 0.5rem;
-      }
-      
-      nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.4rem;
-      }
-      
-      nav a[role="button"] {
-        padding: 0.35rem 0.8rem;
-        font-size: 0.85rem;
-      }
-      
-      main.container {
-        padding: 1rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>Resumen de Inversiones</title>
+    <style>
+        /* Variables de Color Globales para consistencia en toda la app */
+        :root {
+            --primary-blue: #007bff;
+            --dark-blue: #0056b3;
+            --secondary-green: #28a745;
+            --dark-green: #218838;
+            --light-bg: #f4f7fa; /* Fondo general de la página */
+            --card-bg: #ffffff; /* Fondo de los contenedores tipo tarjeta */
+            --text-dark: #343a40; /* Color de texto principal */
+            --text-medium: #6c757d; /* Color de texto secundario/gris */
+            --border-light: #e9ecef; /* Color de bordes sutiles */
+            --header-bg: #eef2f7; /* Fondo de encabezados de tabla/sección */
+            --accent-purple: #6f42c1; /* Color de acento para botones/elementos importantes */
+            --accent-purple-dark: #5a36a0; /* Tono oscuro del acento púrpura */
+            --hover-row: #f8fbfd; /* Fondo de fila al pasar el mouse */
+            --table-header-font: #495057; /* Color de fuente específico para encabezados de tabla */
+
+            /* Colores para mensajes flash */
+            --flash-error-bg: #ffebee;
+            --flash-error-text: #c62828;
+            --flash-error-border: #ef9a9a;
+            --flash-success-bg: #e8f5e9;
+            --flash-success-text: #2e7d32;
+            --flash-success-border: #a5d6a7;
+
+            /* Colores para información de ayuda */
+            --help-info-bg: #e0f2f7;
+            --help-info-border: #2196f3;
+            --help-info-text: #333;
+            --help-info-strong: #0d47a1;
+
+            /* Variables de Pico.css ajustadas para compatibilidad con nuestras variables */
+            --primary: var(--primary-blue);
+            --primary-hover: var(--dark-blue);
+            --active-color: #4cc9f0; /* Mantenemos el color activo para la navegación */
+        }
+        
+        /* Estilos base del body */
+        body {
+            font-family: 'Poppins', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--light-bg); /* Fondo general de la página */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Estilos del Header */
+        header {
+            background-color: rgb(184, 233, 240); /* Un azul muy claro */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 0.rem 0;
+            position: sticky; /* Header siempre visible al hacer scroll */
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1300px; /* Consistente con el ancho del contenido principal */
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            font-size: 1.25rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.25rem;
+            margin: 0;
+        }
+        
+        nav ul {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        nav a[role="button"] {
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            position: relative;
+            overflow: hidden;
+            font-size: 0.9rem;
+            text-decoration: none;
+            color: var(--text-medium);
+        }
+        
+        /* Estilo para botón de navegación activo */
+        nav a[role="button"].active {
+            background-color: var(--active-color);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        /* Efecto hover para botones de navegación no activos */
+        nav a[role="button"]:not(.active):hover {
+            background-color: var(--hover-row);
+            transform: translateY(-1px);
+        }
+        
+        /* Indicador visual adicional para botón de navegación activo */
+        nav a[role="button"].active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 2px;
+            background-color: white;
+            border-radius: 2px;
+        }
+        
+        /* Estilos del Contenido Principal (diseño de tarjeta) */
+        main.container {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            max-width: 1300px; /* Ancho máximo para el contenido principal */
+            margin: 0 auto;
+        }
+
+        .main-content-wrapper {
+            padding: 30px;
+            background-color: var(--card-bg); /* Fondo blanco de tarjeta */
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Sombra suave y extendida */
+            margin: 30px auto; /* Centrar y dar espacio superior/inferior */
+            box-sizing: border-box; /* Asegura que el padding no exceda el ancho */
+        }
+        
+        /* Encabezado de la sección dentro del main-content-wrapper */
+        .card-header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-header-section h2 {
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header-section .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            margin: 0;
+        }
+
+        /* Estilos del Footer */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--card-bg);
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            margin-top: auto;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+        }
+        
+        /* Estilos de Iconos de Criptomonedas */
+        .crypto-icon {
+            width: 20px; /* Tamaño por defecto del icono */
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 6px; /* Espacio a la derecha del icono */
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Evita que el icono se encoja en flexbox */
+        }
+        
+        /* Estilos genéricos para tablas */
+        .table-container { /* Contenedor para scroll horizontal en móviles */
+            width: 100%;
+            /* overflow-x: auto; /* Deshabilitado por defecto para escritorio, se activa en media queries */
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 900px; /* Ancho mínimo para que la tabla no se colapse */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        thead th {
+            background-color: var(--header-bg);
+            color: var(--table-header-font);
+            font-weight: 600;
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid var(--border-light);
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: var(--hover-row);
+        }
+        
+        tbody td {
+            padding: 10px;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Ajustes de ancho para columnas de tabla (de index.html) */
+        th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Fecha */
+        th:nth-child(2), td:nth-child(2) { min-width: 70px; } /* Hora */
+        th:nth-child(3), td:nth-child(3) { min-width: 140px; } /* Moneda Usada */
+        th:nth-child(4), td:nth-child(4) { min-width: 130px; } /* Cantidad Usada */
+        th:nth-child(5), td:nth-child(5) { min-width: 140px; } /* Moneda Comprada */
+        th:nth-child(6), td:nth-child(6) { min-width: 130px; } /* Cantidad Comprada */
+        th:nth-child(7), td:nth-child(7) { min-width: 150px; } /* Precio Unidad */
+
+        /* Celdas de moneda en tabla */
+        .currency-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            height: auto;
+        }
+        .currency-cell .currency-code {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: calc(100% - 26px);
+            display: inline-block;
+        }
+        .numeric-value {
+            font-family: 'Roboto Mono', monospace;
+            text-align: right;
+            color: var(--text-dark);
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
+
+        /* Estilos para estado vacío de tabla */
+        .empty-state-card {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--light-bg);
+            border: 2px dashed var(--border-light);
+            border-radius: 10px;
+            margin-top: 30px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .empty-state-message {
+            font-size: 1.25rem;
+            color: var(--text-medium);
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+
+        /* Estilos de Botones (comunes para todos los botones de acción) */
+        .btn-download-pdf, .btn-primary-action, button[type="submit"]:not([data-pico-variant]), input[type="submit"]:not([data-pico-variant]) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(45deg, var(--accent-purple), #9C27B0); /* Degradado púrpura por defecto */
+            color: white;
+            padding: 12px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            white-space: nowrap; /* Evita que el texto del botón se rompa */
+        }
+        /* Efecto de brillo al pasar el mouse */
+        .btn-download-pdf::before, .btn-primary-action::before, button[type="submit"]:not([data-pico-variant])::before, input[type="submit"]:not([data-pico-variant])::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: all 0.4s ease;
+            z-index: 0;
+        }
+        .btn-download-pdf:hover::before, .btn-primary-action:hover::before, button[type="submit"]:not([data-pico-variant]):hover::before, input[type="submit"]:not([data-pico-variant]):hover::before {
+            left: 100%;
+        }
+        /* Efectos al pasar el mouse y al hacer click */
+        .btn-download-pdf:hover, .btn-primary-action:hover, button[type="submit"]:not([data-pico-variant]):hover, input[type="submit"]:not([data-pico-variant]):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(111, 66, 193, 0.4);
+        }
+        .btn-download-pdf:active, .btn-primary-action:active, button[type="submit"]:not([data-pico-variant]):active, input[type="submit"]:not([data-pico-variant]):active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(111, 66, 193, 0.2);
+        }
+
+        /* Variantes de botones */
+        .btn-sm { /* Botones pequeños */
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(111, 66, 193, 0.2);
+        }
+        .btn-sm:hover {
+            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+        }
+        .btn-sm.primary { /* Para diferenciar si Pico.css se aplica primero */
+            background: linear-gradient(45deg, var(--accent-purple), #9C27B0);
+        }
+
+        .btn-sm.secondary { /* Botón de recalcular/secundario */
+            background: var(--text-medium); /* Color gris/medio */
+            box-shadow: none;
+        }
+        .btn-sm.secondary:hover {
+            background: #5c636a; /* Gris más oscuro al hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-sm.secondary::before {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        /* Icono para botón de descarga PDF */
+        .icon-download-pdf {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2.5;
+        }
+
+        /* Estilos de Mensajes Flash */
+        .flash-message {
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.3rem;
+            font-size: 0.95em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .flash-message.error {
+            background-color: var(--flash-error-bg);
+            color: var(--flash-error-text);
+            border: 1px solid var(--flash-error-border);
+        }
+        .flash-message.success {
+            background-color: var(--flash-success-bg);
+            color: var(--flash-success-text);
+            border: 1px solid var(--flash-success-border);
+        }
+        .flash-message.error::before { content: "🚫"; }
+        .flash-message.success::before { content: "✅"; }
+
+        /* Estilos para Información de Ayuda */
+        .help-info {
+            background-color: var(--help-info-bg);
+            border-left: 4px solid var(--help-info-border);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            color: var(--help-info-text);
+            font-size: 0.95em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .help-info ul {
+            margin: 0.75rem 0 0 1.5rem;
+            padding: 0;
+            list-style-type: disc;
+        }
+        .help-info li {
+            margin-bottom: 0.4rem;
+        }
+        .help-info strong {
+            color: var(--help-info-strong);
+        }
+
+        /* Estilos de Formulario */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Espacio entre grupos de formulario */
+        }
+        .form-row {
+            display: flex;
+            gap: 1rem; /* Espacio entre los elementos de la fila */
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1; /* Los grupos ocuparán el espacio disponible */
+            min-width: 250px; /* Ancho mínimo para evitar colapso excesivo */
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+        }
+        input[type="number"],
+        select {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--card-bg);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            -webkit-appearance: none; /* Eliminar estilos por defecto del navegador */
+            -moz-appearance: none;
+            appearance: none;
+        }
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+        /* Flecha personalizada para select */
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 16px;
+            padding-right: 2.5rem;
+        }
+        select::-ms-expand { display: none; } /* Ocultar flecha en IE/Edge */
+
+        /* Estilos para la sección de resultados de cálculo */
+        .results {
+            background-color: var(--header-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+        .result-line span:first-child {
+            font-weight: 500;
+            color: var(--text-medium);
+        }
+        .result-line span:last-child {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 500;
+            color: var(--primary-blue);
+        }
+        .result-line.highlight {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-light);
+            margin-top: 0.5rem;
+        }
+        .result-line.highlight span:last-child {
+            color: var(--secondary-green);
+            font-size: 1.25rem;
+        }
+        .button-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .button-row .btn-sm {
+             flex-grow: 0;
+             width: auto;
+        }
+
+
+        /* Responsividad general */
+        @media (max-width: 1300px) {
+            .main-content-wrapper {
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+        }
+
+        @media (max-width: 992px) { /* Tabletas */
+            .main-content-wrapper {
+                padding: 25px;
+                margin: 25px auto;
+            }
+            .card-header-section h2 {
+                font-size: 1.9rem;
+            }
+            .btn-download-pdf, .btn-primary-action, button[type="submit"]:not([data-pico-variant]), input[type="submit"]:not([data-pico-variant]) {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+                gap: 6px;
+            }
+            .icon-download-pdf {
+                width: 18px;
+                height: 18px;
+            }
+            /* Activamos el scroll horizontal para tablas en tabletas */
+            .table-container {
+                overflow-x: auto;
+            }
+            table {
+                min-width: 900px; /* Mantener min-width para legibilidad, pero con scroll */
+            }
+            thead th, tbody td {
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+            .crypto-icon {
+                width: 18px;
+                height: 18px;
+            }
+            .numeric-value, .currency-code {
+                font-size: 0.85rem;
+            }
+            .help-info {
+                font-size: 0.85em;
+            }
+            .flash-message {
+                font-size: 0.88em;
+            }
+            .form-group {
+                min-width: unset; /* Deshacer el min-width para móviles */
+                width: 100%; /* Ocupar todo el ancho disponible */
+            }
+        }
+
+        @media (max-width: 768px) { /* Móviles grandes */
+            .header-container {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.5rem;
+            }
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.4rem;
+            }
+            nav a[role="button"] {
+                padding: 0.35rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            main.container {
+                padding: 1rem;
+            }
+            .main-content-wrapper {
+                padding: 20px;
+                margin: 20px auto;
+            }
+            .card-header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .card-header-section h2 {
+                font-size: 1.7rem;
+            }
+            .btn-download-pdf {
+                width: 100%;
+                justify-content: center;
+            }
+            /* Tabla en móvil siempre con scroll horizontal */
+            table {
+                min-width: 700px;
+                width: auto;
+            }
+            thead th, tbody td {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+            .currency-cell {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 2px;
+                white-space: normal;
+                overflow: visible;
+            }
+            .currency-cell .currency-code {
+                white-space: normal;
+                max-width: 100%;
+                text-overflow: clip;
+            }
+            .crypto-icon {
+                margin-right: 0;
+            }
+            /* Formulario en móvil: apilar elementos */
+            .form-row {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .button-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .button-row .btn-sm {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) { /* Móviles pequeños */
+            .main-content-wrapper {
+                padding: 15px;
+                margin: 15px auto;
+                border-radius: 8px;
+            }
+            .card-header-section h2 {
+                font-size: 1.5rem;
+            }
+            .btn-download-pdf span { /* Ocultar texto "Descargar Informe PDF" */
+                display: none;
+            }
+            .btn-download-pdf { /* Convertir botón a solo icono */
+                padding: 10px;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                justify-content: center;
+            }
+            .icon-download-pdf {
+                width: 20px;
+                height: 20px;
+            }
+            thead th, tbody td {
+                padding: 6px;
+                font-size: 0.75rem;
+            }
+            .help-info {
+                font-size: 0.8em;
+            }
+            .flash-message {
+                font-size: 0.85em;
+            }
+            .results {
+                padding: 1rem;
+            }
+            .result-line {
+                font-size: 0.9rem;
+            }
+            .result-line.highlight {
+                font-size: 1.05rem;
+            }
+        }
+        /* Estilos para status.html (resumen de métricas y detalle de criptos) */
+        .summary-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 25px;
+            margin-bottom: 30px;
+        }
+
+        .metric-item {
+            background-color: var(--light-bg); /* Fondo más claro para los ítems */
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .metric-item .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .metric-item .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-family: 'Roboto Mono', monospace; /* Para números */
+            line-height: 1.2;
+        }
+        
+        .metric-item.large-metric .metric-value {
+            font-size: 2.2rem; /* Más grande para ganancia/pérdida */
+        }
+
+        /* Colores para Ganancia/Pérdida */
+        .positive {
+            color: var(--secondary-green); /* Verde */
+        }
+        .negative {
+            color: #ef4444; /* Rojo fuerte */
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-top: 35px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .crypto-detail-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Espacio entre cada criptomoneda */
+        }
+
+        .crypto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg); /* Blanco */
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .crypto-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .crypto-item .crypto-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            min-width: 120px; /* Asegura un ancho mínimo */
+        }
+        .crypto-item .crypto-name .crypto-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 0; /* Ya tenemos gap */
+        }
+
+        .crypto-item .crypto-stats {
+            display: flex;
+            gap: 1rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            flex-wrap: wrap; /* Permitir que los elementos se envuelvan */
+            justify-content: flex-end;
+            text-align: right; /* Para números */
+        }
+
+        .crypto-stats .crypto-balance,
+        .crypto-stats .crypto-total {
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .crypto-stats .crypto-price {
+            color: var(--text-medium);
+            font-weight: 400;
+        }
+
+        
+        @media (max-width: 768px) {
+            .summary-metrics {
+                grid-template-columns: 1fr; /* Una columna en móvil */
+                gap: 1rem;
+            }
+            .metric-item .metric-value {
+                font-size: 1rem;
+            }
+            .metric-item.large-metric .metric-value {
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+                margin-top: 25px;
+                margin-bottom: 15px;
+            }
+            .crypto-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .crypto-item .crypto-name {
+                margin-bottom: 10px;
+            }
+            .crypto-item .crypto-stats {
+                width: 100%;
+                justify-content: space-between; /* Distribuir uniformemente los stats */
+                gap: 0.5rem; /* Menos espacio entre stats */
+                font-size: 0.9rem;
+            }
+            .crypto-stats span {
+                white-space: nowrap; /* Evitar que los números se rompan */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metric-item .metric-value {
+                font-size: 1.3rem;
+            }
+            .metric-item.large-metric .metric-value {
+                font-size: 1.6rem;
+            }
+            .crypto-item .crypto-stats {
+                flex-direction: column; /* Apilar stats */
+                align-items: flex-end; /* Alinear a la derecha */
+                gap: 0.2rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-container">
-      <div class="logo">
-        <span class="logo-icon">📊</span>
-        <h1>Resumen de Inversiones</h1>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="/" role="button" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
-          <li><a href="/purchase" role="button" class="{% if request.path == '/purchase' %}active{% endif %}">Compra</a></li>
-          <li><a href="/status" role="button" class="{% if request.path == '/status' %}active{% endif %}">Estado</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">📊</span>
+                <h1>Resumen de Inversiones</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" role="button" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="/purchase" role="button" class="{% if request.path == '/purchase' %}active{% endif %}">Compra</a></li>
+                    <li><a href="/status" role="button" class="{% if request.path == '/status' %}active{% endif %}">Estado</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-  <main class="container">
-    {% block section %}
-    {% endblock %}
-  </main>
+    <main class="container">
+        {% block section %}
+        {% endblock %}
+    </main>
 
-  <footer>
-    <small>&copy; 2025 - Manuel Jesús Martos Martos. Todos los derechos reservados.</small>
-  </footer>
+    <footer>
+        <small>&copy; 2025 - Manuel Jesús Martos Martos. Todos los derechos reservados.</small>
+    </footer>
 
 </body>
 </html>
