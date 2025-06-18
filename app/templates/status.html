@@ -1,10 +1,180 @@
 {% extends "base.html" %}
 
+{# ESTILOS ESPECÍFICOS PARA LA PÁGINA DE ESTADO DE LA CARTERA #}
+{% block page_styles %}
+<style>
+    .summary-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 25px;
+        margin-bottom: 30px;
+    }
+
+    .metric-item {
+        background-color: var(--light-bg); /* Fondo más claro para los ítems */
+        padding: 1.2rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .metric-item .metric-label {
+        font-size: 0.9rem;
+        color: var(--text-medium);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .metric-item .metric-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        font-family: 'Roboto Mono', monospace; /* Para números */
+        line-height: 1.2;
+    }
+    
+    .metric-item.large-metric .metric-value {
+        font-size: 2.2rem; /* Más grande para ganancia/pérdida */
+    }
+
+    .positive {
+    color: green !important;
+    font-weight: bold;
+    }
+
+    .negative {
+    color: rgb(194, 17, 17) !important;
+    font-weight: bold;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: var(--text-dark);
+        margin-top: 35px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .crypto-detail-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Espacio entre cada criptomoneda */
+    }
+
+    .crypto-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--card-bg); /* Blanco */
+        padding: 1rem 1.2rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .crypto-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .crypto-item .crypto-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: var(--primary-blue);
+        min-width: 120px; /* Asegura un ancho mínimo */
+    }
+    .crypto-item .crypto-name .crypto-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 0; /* Ya tenemos gap */
+    }
+
+    .crypto-item .crypto-stats {
+        display: flex;
+        gap: 1rem;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        flex-wrap: wrap; /* Permitir que los elementos se envuelvan */
+        justify-content: flex-end;
+        text-align: right; /* Para números */
+    }
+
+    .crypto-stats .crypto-balance,
+    .crypto-stats .crypto-total {
+        font-weight: 600;
+        color: var(--dark-blue);
+    }
+
+    .crypto-stats .crypto-price {
+        color: var(--text-medium);
+        font-weight: 400;
+    }
+
+    
+    @media (max-width: 768px) {
+        .summary-metrics {
+            grid-template-columns: 1fr; /* Una columna en móvil */
+            gap: 1rem;
+        }
+        .metric-item .metric-value {
+            font-size: 1rem;
+        }
+        .metric-item.large-metric .metric-value {
+            font-size: 1rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        .crypto-item {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1rem;
+        }
+        .crypto-item .crypto-name {
+            margin-bottom: 10px;
+        }
+        .crypto-item .crypto-stats {
+            width: 100%;
+            justify-content: space-between; /* Distribuir uniformemente los stats */
+            gap: 0.5rem; /* Menos espacio entre stats */
+            font-size: 0.9rem;
+        }
+        .crypto-stats span {
+            white-space: nowrap; /* Evitar que los números se rompan */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .metric-item .metric-value {
+            font-size: 1.3rem;
+        }
+        .metric-item.large-metric .metric-value {
+            font-size: 1.6rem;
+        }
+        .crypto-item .crypto-stats {
+            flex-direction: column; /* Apilar stats */
+            align-items: flex-end; /* Alinear a la derecha */
+            gap: 0.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block section %}
 {% set icon_base = "https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.17.1/svg/color/" %}
 {% set icon_map = {
     'btc': 'btc.svg', 'eth': 'eth.svg', 'usdt': 'usdt.svg', 'bnb': 'bnb.svg',
-    'ada': 'ada.svg', 'xrp': 'xrp.svg', 'xrp': 'xrp.svg', 'sol': 'sol.svg', 'dot': 'dot.svg',
+    'ada': 'ada.svg', 'xrp': 'xrp.svg', 'sol': 'sol.svg', 'dot': 'dot.svg',
     'ltc': 'ltc.svg', 'doge': 'doge.svg', 'eur': 'eur.svg', 'usd': 'usd.svg'
 } %}
 
@@ -18,27 +188,27 @@
     <div class="summary-metrics">
         <div class="metric-item">
             <span class="metric-label">Invertido:</span>
-            <span class="metric-value">{{ '{:,.2f}'.format(invertido) }} EUR</span>
+            <span class="metric-value">{{ '{:,.2f}'.format(invertido) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
         </div>
         <div class="metric-item">
             <span class="metric-label">Recuperado:</span>
-            <span class="metric-value">{{ '{:,.2f}'.format(recuperado) }} EUR</span>
+            <span class="metric-value">{{ '{:,.2f}'.format(recuperado) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
         </div>
         <div class="metric-item">
             <span class="metric-label">Valor de compra:</span>
-            <span class="metric-value">{{ '{:,.2f}'.format(valor_compra) }} EUR</span>
+            <span class="metric-value">{{ '{:,.2f}'.format(valor_compra) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
         </div>
         <div class="metric-item">
             <span class="metric-label">Valor actual:</span>
-            <span class="metric-value">{{ '{:,.2f}'.format(total_actual) }} EUR</span>
+            <span class="metric-value">{{ '{:,.2f}'.format(total_actual) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
         </div>
         <div class="metric-item large-metric">
             <span class="metric-label">Ganancia/Pérdida:</span>
             <span class="metric-value {% if ganancia_perdida >= 0 %}positive{% else %}negative{% endif %}">
                 {% if ganancia_perdida >= 0 %}
-                    🔺 {{ '{:,.2f}'.format(ganancia_perdida) }} EUR
+                    🔺 {{ '{:,.2f}'.format(ganancia_perdida) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR
                 {% else %}
-                    🔻 {{ '{:,.2f}'.format(ganancia_perdida) }} EUR
+                    🔻 {{ '{:,.2f}'.format(ganancia_perdida) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR
                 {% endif %}
             </span>
         </div>
@@ -49,19 +219,21 @@
         {% for m, info in cripto_valores.items() %}
             <div class="crypto-item">
                 <div class="crypto-name">
-                    <img src="{{ url_for('static', filename='img/' ~ m|lower ~ '.svg') }}" alt="{{ m }} icon" class="crypto-icon">
+                    {% if m|lower in icon_map %}
+                        <img src="{{ icon_base }}{{ icon_map[m|lower] }}" alt="{{ m }} icon" class="crypto-icon">
+                    {% else %}
+                        {# Puedes usar un icono por defecto o simplemente no mostrar nada si no hay icono disponible #}
+                        {% endif %}
                     {{ m }}
                 </div>
                 <div class="crypto-stats">
-                    <span class="crypto-balance">{{ '{:,.6f}'.format(info.saldo)|replace(',', '_')|replace('.', ',')|replace('_', '.') }}</span> unidades
-                    <span class="crypto-price">@ {{ '{:,.2f}'.format(info.tasa)|replace(',', '_')|replace('.', ',')|replace('_', '.') }} EUR</span>
-                    <span class="crypto-total">{{ '{:,.2f}'.format(info.euros)|replace(',', '_')|replace('.', ',')|replace('_', '.') }} EUR</span>
+                    <span class="crypto-balance">{{ '{:,.6f}'.format(info.saldo) | replace(',', '_') | replace('.', ',') | replace('_', '.') }}</span> unidades
+                    <span class="crypto-price">@ {{ '{:,.2f}'.format(info.tasa) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
+                    <span class="crypto-total">{{ '{:,.2f}'.format(info.euros) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
                 </div>
             </div>
         {% endfor %}
     </div>
 
 </section>
-
-
 {% endblock %}
