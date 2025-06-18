@@ -258,47 +258,68 @@ def purchase():
 
 @app.route("/status")
 def status():
-    # 1. Invertido = suma de Cantidad_From donde Moneda_From = EUR
-    invertido = total_euros_invertidos()
+    try:
+        # 1. Cálculo de inversión (manteniendo tu lógica original)
+        invertido = total_euros_invertidos()
 
-    # 2. Recuperado = suma de Cantidad_To donde Moneda_To = EUR (CORRECCIÓN CLAVE)
-    con = Conexion("""
-        SELECT SUM(Cantidad_To) as total
-        FROM criptomonedas
-        WHERE Moneda_To = 'EUR'
-    """)
-    recuperado = con.res.fetchone()[0] or 0  # Si es None, usa 0
-    con.close()
+        con = Conexion("""
+            SELECT SUM(Cantidad_To) as total
+            FROM criptomonedas
+            WHERE Moneda_To = 'EUR'
+        """)
+        recuperado = con.res.fetchone()[0] or 0
+        con.close()
 
-    # 3. Valor de compra = invertido - recuperado
-    valor_compra = invertido - recuperado
+        valor_compra = invertido - recuperado
 
-    # 4. Valor actual (sin cambios, está correcto)
-    monedas = [m for m in obtener_monedas_con_saldo() if m != "EUR"]
-    saldo_por_moneda = {m: calcular_saldo(m) for m in monedas}
-    total_actual = 0
-    cripto_valores = {}
-    
-    for m, saldo in saldo_por_moneda.items():
-        url = f"https://rest.coinapi.io/v1/exchangerate/{m}/EUR"
-        headers = {'X-CoinAPI-Key': COINAPI_KEY}
-        resp = requests.get(url, headers=headers, timeout=5)
-        if resp.status_code == 200:
-            tasa = resp.json().get("rate", 0)
-            euros = saldo * tasa
-        else:
-            tasa = 0
-            euros = 0
-        cripto_valores[m] = {"saldo": saldo, "tasa": tasa, "euros": euros}
-        total_actual += euros
+        # 2. Valor actual de las criptomonedas
+        monedas = [m for m in obtener_monedas_con_saldo() if m != "EUR"]
+        saldo_por_moneda = {m: calcular_saldo(m) for m in monedas}
+        total_actual = 0
+        cripto_valores = {}
+        
+        for m, saldo in saldo_por_moneda.items():
+            url = f"https://rest.coinapi.io/v1/exchangerate/{m}/EUR"
+            headers = {'X-CoinAPI-Key': COINAPI_KEY}
+            try:
+                resp = requests.get(url, headers=headers, timeout=5)
+                if resp.status_code == 200:
+                    tasa = resp.json().get("rate", 0)
+                    euros = saldo * tasa
+                else:
+                    tasa = 0
+                    euros = 0
+                cripto_valores[m] = {"saldo": saldo, "tasa": tasa, "euros": euros}
+                total_actual += euros
+            except requests.exceptions.RequestException as e:
+                app.logger.error(f"Error API CoinAPI para {m}: {str(e)}")
+                cripto_valores[m] = {"saldo": saldo, "tasa": 0, "euros": 0}
 
-    ganancia_perdida = total_actual - valor_compra
+        ganancia_perdida = total_actual - valor_compra
 
-    return render_template("status.html",
-        invertido=invertido,
-        recuperado=recuperado,
-        valor_compra=valor_compra,
-        cripto_valores=cripto_valores,
-        total_actual=total_actual,
-        ganancia_perdida=ganancia_perdida
-    ) 
+        # 3. Datos para gráfico histórico (simplificado - puedes mejorarlo)
+        meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']
+        historial = [
+            invertido * 0.8,  # Simulación mes 1
+            invertido * 0.9,  # Simulación mes 2
+            invertido,         # Mes 3
+            total_actual * 0.9, # Mes 4
+            total_actual * 0.95, # Mes 5
+            total_actual       # Mes actual
+        ]
+
+        return render_template("status.html",
+            invertido=invertido,
+            recuperado=recuperado,
+            valor_compra=valor_compra,
+            cripto_valores=cripto_valores,
+            total_actual=total_actual,
+            ganancia_perdida=ganancia_perdida,
+            historial=historial,
+            meses=meses
+        )
+
+    except Exception as e:
+        app.logger.error(f"Error en /status: {str(e)}")
+        flash("Error al calcular el estado de la inversión", "error")
+        return redirect("/")

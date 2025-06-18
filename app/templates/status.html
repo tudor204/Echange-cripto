@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-{# ESTILOS ESPECÍFICOS PARA LA PÁGINA DE ESTADO DE LA CARTERA #}
 {% block page_styles %}
 <style>
     .summary-metrics {
@@ -12,7 +11,7 @@
     }
 
     .metric-item {
-        background-color: var(--light-bg); /* Fondo más claro para los ítems */
+        background-color: var(--light-bg);
         padding: 1.2rem 1.5rem;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -32,22 +31,22 @@
         font-size: 1.6rem;
         font-weight: 700;
         color: var(--text-dark);
-        font-family: 'Roboto Mono', monospace; /* Para números */
+        font-family: 'Roboto Mono', monospace;
         line-height: 1.2;
     }
     
     .metric-item.large-metric .metric-value {
-        font-size: 2.2rem; /* Más grande para ganancia/pérdida */
+        font-size: 2.2rem;
     }
 
     .positive {
-    color: green !important;
-    font-weight: bold;
+        color: green !important;
+        font-weight: bold;
     }
 
     .negative {
-    color: rgb(194, 17, 17) !important;
-    font-weight: bold;
+        color: rgb(194, 17, 17) !important;
+        font-weight: bold;
     }
 
     .section-title {
@@ -63,14 +62,14 @@
     .crypto-detail-list {
         display: flex;
         flex-direction: column;
-        gap: 10px; /* Espacio entre cada criptomoneda */
+        gap: 10px;
     }
 
     .crypto-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: var(--card-bg); /* Blanco */
+        background-color: var(--card-bg);
         padding: 1rem 1.2rem;
         border-radius: 8px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -88,12 +87,13 @@
         gap: 8px;
         font-weight: 600;
         color: var(--primary-blue);
-        min-width: 120px; /* Asegura un ancho mínimo */
+        min-width: 120px;
     }
+    
     .crypto-item .crypto-name .crypto-icon {
         width: 24px;
         height: 24px;
-        margin-right: 0; /* Ya tenemos gap */
+        margin-right: 0;
     }
 
     .crypto-item .crypto-stats {
@@ -102,9 +102,9 @@
         font-family: 'Roboto Mono', monospace;
         font-size: 0.95rem;
         color: var(--text-dark);
-        flex-wrap: wrap; /* Permitir que los elementos se envuelvan */
+        flex-wrap: wrap;
         justify-content: flex-end;
-        text-align: right; /* Para números */
+        text-align: right;
     }
 
     .crypto-stats .crypto-balance,
@@ -118,10 +118,31 @@
         font-weight: 400;
     }
 
+    /* Estilos para los gráficos */
+    .chart-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-container {
+        background: var(--card-bg);
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        height: 350px;
+    }
+    
+    .chart-container h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+    }
     
     @media (max-width: 768px) {
         .summary-metrics {
-            grid-template-columns: 1fr; /* Una columna en móvil */
+            grid-template-columns: 1fr;
             gap: 1rem;
         }
         .metric-item .metric-value {
@@ -145,12 +166,15 @@
         }
         .crypto-item .crypto-stats {
             width: 100%;
-            justify-content: space-between; /* Distribuir uniformemente los stats */
-            gap: 0.5rem; /* Menos espacio entre stats */
+            justify-content: space-between;
+            gap: 0.5rem;
             font-size: 0.9rem;
         }
         .crypto-stats span {
-            white-space: nowrap; /* Evitar que los números se rompan */
+            white-space: nowrap;
+        }
+        .chart-grid {
+            grid-template-columns: 1fr;
         }
     }
 
@@ -162,8 +186,8 @@
             font-size: 1.6rem;
         }
         .crypto-item .crypto-stats {
-            flex-direction: column; /* Apilar stats */
-            align-items: flex-end; /* Alinear a la derecha */
+            flex-direction: column;
+            align-items: flex-end;
             gap: 0.2rem;
         }
     }
@@ -214,6 +238,20 @@
         </div>
     </div>
 
+    {# Sección de gráficos #}
+    <div class="chart-grid">
+        <div class="chart-container">
+            <h3 class="section-title">Evolución de la Inversión</h3>
+            <canvas id="evolutionChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3 class="section-title">Distribución de la Cartera</h3>
+            <canvas id="distributionChart"></canvas>
+        </div>
+    </div>
+
+    {# Sección de detalle de criptomonedas #}
     <h3 class="section-title">Detalle de Criptomonedas:</h3>
     <div class="crypto-detail-list">
         {% for m, info in cripto_valores.items() %}
@@ -221,9 +259,7 @@
                 <div class="crypto-name">
                     {% if m|lower in icon_map %}
                         <img src="{{ icon_base }}{{ icon_map[m|lower] }}" alt="{{ m }} icon" class="crypto-icon">
-                    {% else %}
-                        {# Puedes usar un icono por defecto o simplemente no mostrar nada si no hay icono disponible #}
-                        {% endif %}
+                    {% endif %}
                     {{ m }}
                 </div>
                 <div class="crypto-stats">
@@ -234,6 +270,83 @@
             </div>
         {% endfor %}
     </div>
-
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de evolución
+    const evolutionCtx = document.getElementById('evolutionChart');
+    if (evolutionCtx) {
+        new Chart(evolutionCtx, {
+            type: 'line',
+            data: {
+                labels: {{ meses|tojson }},
+                datasets: [{
+                    label: 'Valor total (EUR)',
+                    data: {{ historial|tojson }},
+                    borderColor: '#4bc0c0',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw.toFixed(2)} EUR`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico de distribución
+    const distributionCtx = document.getElementById('distributionChart');
+    if (distributionCtx) {
+        new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ cripto_valores.keys()|list|tojson }},
+                datasets: [{
+                    data: {{ cripto_valores.values()|map(attribute='euros')|list|tojson }},
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40', '#8AC24A', '#EA5F89'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = (context.raw / total * 100).toFixed(2);
+                                return `${context.label}: ${context.raw.toFixed(2)} EUR (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+
 {% endblock %}
