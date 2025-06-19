@@ -203,20 +203,16 @@ def download_pdf():
                     headers={'Content-Disposition': 'attachment;filename=informe_completo_inversiones.pdf'})
 
 
-
 @app.route("/")
 def index():
     registros = select_all()
     return render_template("index.html", data=registros, iconos=ICONOS_CRIPTOS)
 
 
-
 @app.route("/purchase", methods=["GET", "POST"])
 def purchase():
     monedas_con_saldo = obtener_monedas_con_saldo()
-    # Asegúrate de que EUR siempre esté disponible como opción "From" si no hay saldo de criptos
-    monedas_from_display = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']
-    # Ahora, todas las criptos de CRYPTO_LIST (que incluye EUR) son opciones válidas para 'To'
+    monedas_from_display = ['EUR'] + [m for m in monedas_con_saldo if m != 'EUR']   
     todas_las_criptos_disponibles = CRYPTO_LIST
 
     # --- Inicializar variables que podrían no existir ---
@@ -247,7 +243,7 @@ def purchase():
                 accion='inicio'
             )
 
-        # Validaciones de combinaciones no permitidas (estas se mantienen)
+        # Validaciones de combinaciones no permitidas 
         if moneda_from == moneda_to:
             flash("No puedes operar con la misma criptomoneda como origen y destino. Selecciona monedas diferentes.", "error")
             return render_template("purchase.html",
@@ -260,7 +256,6 @@ def purchase():
                 tasa_cambio=tasa_cambio,
                 accion='inicio'
             )
-
         
         if moneda_from not in monedas_from_display or moneda_to not in todas_las_criptos_disponibles:
             flash("La combinación seleccionada no está permitida. Revisa las opciones disponibles.", "error")
@@ -323,8 +318,7 @@ def purchase():
                 )
 
         # Acción: validar y guardar operación
-        elif accion == "validar":
-            # Si Moneda_From es EUR, no necesitamos verificar el saldo
+        elif accion == "validar":            
             if moneda_from != "EUR":
                 saldo = calcular_saldo(moneda_from)
                 cantidad_to = float(request.form.get("cantidad_to", 0))
@@ -342,8 +336,7 @@ def purchase():
                         tasa_cambio=tasa_cambio,
                         accion='calcular'
                     )
-
-            # Para que la cantidad_to y tasa_cambio estén siempre definidas para el insert
+            
             cantidad_to = float(request.form.get("cantidad_to", 0))
             tasa_cambio = float(request.form.get("tasa_cambio_oculto", 0))
 
@@ -370,7 +363,7 @@ def purchase():
         monedas_from=monedas_from_display,
         todas_criptos=todas_las_criptos_disponibles,
         moneda_from=moneda_from if moneda_from else 'EUR',
-        moneda_to=moneda_to if moneda_to else 'BTC', # Se mantiene BTC como default si no hay selección previa
+        moneda_to=moneda_to if moneda_to else 'BTC', 
         cantidad_from=cantidad_from,
         cantidad_to=cantidad_to,
         tasa_cambio=tasa_cambio,
@@ -380,7 +373,7 @@ def purchase():
 @app.route("/status")
 def status():
     try:
-        # 1. Cálculo de inversión (manteniendo tu lógica original)
+        # 1. Cálculo de inversión 
         invertido = total_euros_invertidos()
 
         con = Conexion("""
@@ -418,7 +411,7 @@ def status():
 
         ganancia_perdida = total_actual - valor_compra
 
-        # 3. Datos para gráfico histórico (simplificado - puedes mejorarlo)
+        # 3. Datos para gráfico histórico 
         meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']
         historial = [
             invertido * 0.8,  # Simulación mes 1
