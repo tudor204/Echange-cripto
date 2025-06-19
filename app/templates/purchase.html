@@ -42,7 +42,7 @@
                 </select>
             </div>
 
-            <div class="form-group"> {# Quité la clase 'compact' #}
+            <div class="form-group">
                 <label for="toCurrencySelect">A</label>
                 <select name="to_currency" id="toCurrencySelect">
                     {# IMPORTANTE: Ahora iteramos sobre todas_criptos para permitir cualquier destino #}
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div class="form-group"> {# Quité la clase 'compact' #}
+        <div class="form-group"> 
             <label for="amountInput">Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
             <input type="number" name="amount" id="amountInput" min="0.000001" step="any"
                 value="{{ cantidad_from if cantidad_from else '' }}"
@@ -67,11 +67,11 @@
         <div class="results">
             <div class="result-line">
                 <span>Tasa:</span>
-                <span>1 {{ moneda_from }} = {{ "%.6f"|format(tasa_cambio) }} {{ moneda_to }}</span>
+                <span>1 {{ moneda_from }} = {{ '{:,.6f}'.format(tasa_cambio | float).replace(',', 'TEMP').replace('.', ',').replace('TEMP', '.') }} {{ moneda_to }}</span>
             </div>
             <div class="result-line highlight">
                 <span>Recibirás:</span>
-                <span>{{ "%.6f"|format(cantidad_to) }} {{ moneda_to }}</span>
+                <span>{{ '{:,.4f}'.format(cantidad_to | float).replace(',', 'TEMP').replace('.', ',').replace('TEMP', '.') }} {{ moneda_to }}</span>
             </div>
 
             <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}" />
