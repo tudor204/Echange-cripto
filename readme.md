@@ -13,7 +13,7 @@ Aplicación web para el seguimiento y gestión de inversiones en criptomonedas y
 - 🔍 Filtrado y búsqueda de transacciones históricas
 - 📱 Diseño responsive para todos los dispositivos
 
-(https://github.com/tudor204/Echange-cripto/blob/main/app/images/purchase.png)
+![Captura de pantalla de la aplicación](https://github.com/tudor204/Echange-cripto/blob/main/app/images/purchase.png)
 
 ## 🛠 Tecnologías utilizadas
 
@@ -29,7 +29,7 @@ Aplicación web para el seguimiento y gestión de inversiones en criptomonedas y
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/resumen-inversiones.git
+   git clone https://https://github.com/tudor204/Echange-cripto
    cd resumen-inversiones
 Crea un entorno virtual (recomendado):
 
@@ -72,4 +72,4 @@ resumen-inversiones/
     ├── models.py           # Modelos de datos
     └── queries.py          # Consultas SQL
 
-(https://github.com/tudor204/Echange-cripto/blob/main/app/images/status.png)
+![Captura de pantalla de la aplicación](https://github.com/tudor204/Echange-cripto/blob/main/app/images/status.png)
