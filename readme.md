@@ -2,7 +2,7 @@
 
 Aplicación web para el seguimiento y gestión de inversiones en criptomonedas y activos financieros.
 
-![Captura de pantalla de la aplicación](https://via.placeholder.com/800x500.png?text=Screenshot+Here) <!-- Reemplaza con una imagen real de tu proyecto -->
+![Captura de pantalla de la aplicación](https://github.com/tudor204/Echange-cripto/blob/main/app/images/index.png) <!-- Reemplaza con una imagen real de tu proyecto -->
 
 ## ✨ Características principales
 
@@ -12,6 +12,8 @@ Aplicación web para el seguimiento y gestión de inversiones en criptomonedas y
 - 📤 Exportación de datos en formato PDF
 - 🔍 Filtrado y búsqueda de transacciones históricas
 - 📱 Diseño responsive para todos los dispositivos
+
+(https://github.com/tudor204/Echange-cripto/blob/main/app/images/purchase.png)
 
 ## 🛠 Tecnologías utilizadas
 
@@ -69,28 +71,5 @@ resumen-inversiones/
 └── database/               # Gestión de base de datos
     ├── models.py           # Modelos de datos
     └── queries.py          # Consultas SQL
-🌍 Despliegue
-Para desplegar en producción (ejemplo para Heroku):
 
-Crea una cuenta en Heroku
-
-Instala el CLI de Heroku
-
-Ejecuta:
-
-bash
-heroku create
-git push heroku main
-heroku open
-🤝 Contribución
-Las contribuciones son bienvenidas. Sigue estos pasos:
-
-Haz un fork del proyecto
-
-Crea una rama con tu feature (git checkout -b feature/AmazingFeature)
-
-Haz commit de tus cambios (git commit -m 'Add some AmazingFeature')
-
-Haz push a la rama (git push origin feature/AmazingFeature)
-
-Abre un Pull Request
+(https://github.com/tudor204/Echange-cripto/blob/main/app/images/status.png)
