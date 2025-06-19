@@ -62,7 +62,7 @@
             background-color: rgb(184, 233, 240); /* Un azul muy claro */
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             padding: 0.rem 0;
-            position: sticky; /* Header siempre visible al hacer scroll */
+            position:relative; /* Header siempre visible al hacer scroll */
             top: 0;
             z-index: 100;
         }
@@ -71,7 +71,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1300px; /* Consistente con el ancho del contenido principal */
+            max-width: 1200px; /* Consistente con el ancho del contenido principal */
             margin: 0 auto;
             padding: 0 1rem;
         }
@@ -85,57 +85,62 @@
         }
         
         .logo-icon {
-            font-size: 1.25rem;
+            font-size: 1.5rem; 
+            color: #333; 
+            vertical-align: middle; 
+            margin-right: 0.5rem;
         }
         
         .logo h1 {
-            font-size: 1.25rem;
+            font-size: 2.25rem; 
             margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #222; 
+            letter-spacing: -0.03em;
+            font-weight: 600; 
         }
         
+        /* ESTILOS ACTUALIZADOS PARA LOS BOTONES DE NAVEGACIÓN */
         nav ul {
             margin: 0;
             padding: 0;
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
         
         nav a[role="button"] {
             transition: all 0.3s ease;
-            border-radius: 50px;
-            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            padding: 0.5rem 1.25rem;
             position: relative;
             overflow: hidden;
             font-size: 0.9rem;
             text-decoration: none;
-            color: var(--text-medium);
+            color: var(--text-dark);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-light);
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        /* Estilo para botón de navegación activo */
+        nav a[role="button"]:hover {
+            background-color: var(--light-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        
         nav a[role="button"].active {
-            background-color: var(--active-color);
-            color: rgb(201, 12, 12);
-            font-weight: bold;
-            box-shadow: 0 1px 3px rgba(204, 14, 14, 0.2);
+            background-color: var(--primary-blue);
+            color: white;
+            font-weight: 500;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
         }
         
-        /* Efecto hover para botones de navegación no activos */
         nav a[role="button"]:not(.active):hover {
-            background-color: var(--hover-row);
-            transform: translateY(-1px);
-        }
-        
-        /* Indicador visual adicional para botón de navegación activo */
-        nav a[role="button"].active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
-            height: 2px;
-            background-color: rgb(226, 12, 12);
-            border-radius: 2px;
+            transition: all 0.2s ease-out;
         }
         
         /* Estilos del Contenido Principal (diseño de tarjeta) */
@@ -426,46 +431,78 @@
 
         /* Estilos de Formulario */
         form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem; /* Espacio entre grupos de formulario */
-        }
-        .form-row {
-            display: flex;
-            gap: 1rem; /* Espacio entre los elementos de la fila */
-            flex-wrap: wrap;
-        }
-        .form-group {
-            flex: 1; /* Los grupos ocuparán el espacio disponible */
-            min-width: 250px; /* Ancho mínimo para evitar colapso excesivo */
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            font-size: 0.9rem;
-            color: var(--text-medium);
-            margin-bottom: 0.4rem;
-            font-weight: 500;
-        }
-        input[type="number"],
-        select {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            font-size: 1rem;
-            color: var(--text-dark);
-            background-color: var(--card-bg);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            -webkit-appearance: none; /* Eliminar estilos por defecto del navegador */
-            -moz-appearance: none;
-            appearance: none;
-        }
-        input[type="number"]:focus,
-        select:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-            outline: none;
-        }
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Mantenemos un buen espacio entre secciones del formulario */
+    padding: 2rem; /* Añadimos padding al formulario para que no se pegue a los bordes */
+    background-color: #ffffff; /* Fondo blanco para el formulario, destacándolo */
+    border-radius: 8px; /* Bordes ligeramente redondeados para un aspecto suave */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra sutil para darle profundidad */
+}
+
+.form-row {
+    display: flex;
+    gap: 1.25rem; /* Aumento sutil en el espacio entre elementos de la fila para mayor claridad */
+    flex-wrap: wrap;
+    justify-content: space-between; /* Distribuye el espacio entre los grupos */
+}
+
+.form-group {
+    flex: 1;
+    min-width: 280px; /* Incrementamos ligeramente el ancho mínimo para mejor legibilidad en pantallas pequeñas */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem; /* Pequeño margen inferior para separar grupos visualmente */
+}
+
+.form-group label {
+    font-size: 0.95rem; /* Ligeramente más grande para mayor legibilidad */
+    color: var(--text-dark); /* Color más oscuro para las etiquetas para mejor contraste */
+    margin-bottom: 0.6rem; /* Aumentamos el espacio entre la etiqueta y el input */
+    font-weight: 600; /* Hacemos las etiquetas más robustas */
+    display: block; /* Asegura que cada etiqueta ocupe su propia línea */
+}
+
+input[type="number"],
+select {
+    padding: 0.85rem 1.1rem; /* Un poco más de padding para hacer los campos más "tocables" */
+    border: 1px solid var(--border-light);
+    border-radius: 8px; /* Bordes un poco más redondeados para suavizar el diseño */
+    font-size: 1rem;
+    color: var(--text-dark);
+    background-color: #ffffff; /* Fondo blanco para los inputs */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra interna sutil para dar profundidad */
+}
+
+input[type="number"]:focus,
+select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow); /* La sombra de enfoque más prominente */
+    outline: none;
+    background-color: #fff; /* Asegura que el fondo no cambie al enfocar */
+}
+
+/* Estilos para placeholdes (opcional pero recomendable) */
+input::placeholder {
+    color: var(--text-medium);
+    opacity: 0.7; /* Ligeramente más transparente */
+}
+
+/* Estilos para mensajes de error (si los necesitas) */
+.form-group.has-error input,
+.form-group.has-error select {
+    border-color: var(--error-red);
+}
+
+.form-group.has-error .error-message {
+    color: var(--error-red);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+}
         /* Flecha personalizada para select */
         select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");

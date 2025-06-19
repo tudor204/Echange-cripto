@@ -46,7 +46,7 @@
                         {% if icon_map[from_symbol] %}<img src="{{ icon_base ~ icon_map[from_symbol] }}" alt="{{ from_symbol }}" class="crypto-icon">{% endif %}
                         <span class="currency-code">{{ mov['Moneda_From'] }}</span>
                     </td>
-                    <td data-label="Cantidad Usada" class="numeric-value">{{ '%.6f' | format(mov['Cantidad_From']) }}</td>
+                    <td data-label="Cantidad Usada" class="numeric-value">{{ '%.2f' | format(mov['Cantidad_From']) }}</td>
                     <td data-label="Moneda Comprada" class="currency-cell">
                         {% set to_symbol = mov['Moneda_To']|lower %}
                         {% if icon_map[to_symbol] %}<img src="{{ icon_base ~ icon_map[to_symbol] }}" alt="{{ to_symbol }}" class="crypto-icon">{% endif %}
