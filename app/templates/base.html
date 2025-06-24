@@ -1,330 +1,151 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.10/css/pico.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Inversiones</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <title>Resumen de Inversiones</title>
+    
+    <!-- Custom CSS -->
     <style>
-        /* Variables de Color Globales para consistencia en toda la app */
         :root {
-            --primary-blue: #007bff;
-            --dark-blue: #0056b3;
-            --secondary-green: #28a745;
-            --dark-green: #218838;
-            --light-bg: #f4f7fa; /* Fondo general de la página */
-            --card-bg: #ffffff; /* Fondo de los contenedores tipo tarjeta */
-            --text-dark: #343a40; /* Color de texto principal */
-            --text-medium: #6c757d; /* Color de texto secundario/gris */
-            --border-light: #e9ecef; /* Color de bordes sutiles */
-            --header-bg: #eef2f7; /* Fondo de encabezados de tabla/sección */
-            --accent-purple: #6f42c1; /* Color de acento para botones/elementos importantes */
-            --accent-purple-dark: #5a36a0; /* Tono oscuro del acento púrpura */
-            --hover-row: #f8fbfd; /* Fondo de fila al pasar el mouse */
-            --table-header-font: #495057; /* Color de fuente específico para encabezados de tabla */
-
-            /* Colores para mensajes flash */
-            --flash-error-bg: #ffebee;
-            --flash-error-text: #c62828;
-            --flash-error-border: #ef9a9a;
-            --flash-success-bg: #e8f5e9;
-            --flash-success-text: #2e7d32;
-            --flash-success-border: #a5d6a7;
-
-            /* Colores para información de ayuda */
-            --help-info-bg: #e0f2f7;
-            --help-info-border: #2196f3;
-            --help-info-text: #333;
-            --help-info-strong: #0d47a1;
-
-            /* Variables de Pico.css ajustadas para compatibilidad con nuestras variables */
-            --primary: var(--primary-blue);
-            --primary-hover: var(--dark-blue);
-            --active-color: #4cc9f0; /* Mantenemos el color activo para la navegación */
+            --primary-blue: #0d6efd;
+            --dark-blue: #0b5ed7;
+            --secondary-green: #198754;
+            --dark-green: #157347;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-dark: #212529;
+            --text-medium: #6c757d;
+            --border-light: #dee2e6;
+            --header-bg: #e9ecef;
+            --accent-purple: #6f42c1;
+            --accent-purple-dark: #5a36a0;
+            --hover-row: #f8f9fa;
+            --table-header-font: #495057;
+            
+            --flash-error-bg: #f8d7da;
+            --flash-error-text: #842029;
+            --flash-error-border: #f5c2c7;
+            --flash-success-bg: #d1e7dd;
+            --flash-success-text: #0f5132;
+            --flash-success-border: #badbcc;
+            
+            --help-info-bg: #e7f5ff;
+            --help-info-border: #86b7fe;
+            --help-info-text: #084298;
+            --help-info-strong: #052c65;
         }
         
-        /* Estilos base del body */
         body {
             font-family: 'Poppins', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-dark);
             line-height: 1.6;
-            background-color: var(--light-bg); /* Fondo general de la página */
+            background-color: var(--light-bg);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
         
-        /* Estilos del Header */
-        header {
-            background-color: rgb(184, 233, 240); /* Un azul muy claro */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 0.rem 0;
-            position:relative; /* Header siempre visible al hacer scroll */
-            top: 0;
-            z-index: 100;
+        /* Navbar premium */
+        .navbar {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 0;
         }
         
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px; /* Consistente con el ancho del contenido principal */
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        .logo {
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-weight: bold;
-            color: var(--primary);
         }
         
-        .logo-icon {
-            font-size: 1.5rem; 
-            color: #333; 
-            vertical-align: middle; 
-            margin-right: 0.5rem;
+        .navbar-brand i {
+            font-size: 1.5rem;
         }
         
-        .logo h1 {
-            font-size: 2.25rem; 
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #222; 
-            letter-spacing: -0.03em;
-            font-weight: 600; 
-        }
-        
-        /* ESTILOS ACTUALIZADOS PARA LOS BOTONES DE NAVEGACIÓN */
-        nav ul {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        nav a[role="button"] {
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
             transition: all 0.3s ease;
-            border-radius: 6px;
-            padding: 0.5rem 1.25rem;
-            position: relative;
-            overflow: hidden;
-            font-size: 0.9rem;
-            text-decoration: none;
-            color: var(--text-dark);
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-light);
-            font-weight: 500;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        nav a[role="button"]:hover {
-            background-color: var(--light-bg);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
+        .nav-link:hover, .nav-link:focus {
+            background-color: rgba(255, 255, 255, 0.15);
         }
         
-        nav a[role="button"].active {
-            background-color: var(--primary-blue);
-            color: white;
-            font-weight: 500;
-            border-color: var(--primary-blue);
-            box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            font-weight: 600;
         }
         
-        nav a[role="button"]:not(.active):hover {
-            transition: all 0.2s ease-out;
-        }
-        
-        /* Estilos del Contenido Principal (diseño de tarjeta) */
+        /* Main content */
         main.container {
             flex: 1;
-            padding: 1.5rem 1rem;
-            max-width: 1300px; /* Ancho máximo para el contenido principal */
-            margin: 0 auto;
-        }
-
-        .main-content-wrapper {
-            padding: 30px;
-            background-color: var(--card-bg); /* Fondo blanco de tarjeta */
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Sombra suave y extendida */
-            margin: 30px auto; /* Centrar y dar espacio superior/inferior */
-            box-sizing: border-box; /* Asegura que el padding no exceda el ancho */
+            padding: 2rem 1rem;
+            max-width: 1400px;
         }
         
-        /* Encabezado de la sección dentro del main-content-wrapper */
+        .main-content-wrapper {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
         .card-header-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-light);
         }
-
+        
         .card-header-section h2 {
-            font-size: 2.2rem;
-            color: var(--text-dark);
-            margin: 0;
+            font-size: 2rem;
             font-weight: 600;
-            letter-spacing: -0.5px;
+            margin: 0;
+            color: var(--text-dark);
         }
-
-        .card-header-section .subtitle {
+        
+        .subtitle {
+            color: var(--text-medium);
             font-size: 1.1rem;
-            color: var(--text-medium);
             margin: 0;
         }
-
-        /* Estilos del Footer */
-        footer {
-            text-align: center;
-            padding: 1rem;
-            background-color: var(--card-bg);
-            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
-            margin-top: auto;
-            font-size: 1rem;
-            color: var(--text-medium);
-        }
         
-        /* Estilos de Iconos de Criptomonedas (para tablas, etc.) */
-        .crypto-icon {
-            width: 20px; /* Tamaño por defecto del icono */
-            height: 20px;
-            vertical-align: middle;
-            margin-right: 6px; /* Espacio a la derecha del icono */
-            border-radius: 50%;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            flex-shrink: 0; /* Evita que el icono se encoja en flexbox */
-        }
-        
-        /* Estilos genéricos para tablas */
-        .table-container { /* Contenedor para scroll horizontal en móviles */
-            width: 100%;
-            /* overflow-x: auto; /* Deshabilitado por defecto para escritorio, se activa en media queries */
-            -webkit-overflow-scrolling: touch;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            min-width: 900px; /* Ancho mínimo para que la tabla no se colapse */
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        
-        thead th {
-            background-color: var(--header-bg);
-            color: var(--table-header-font);
-            font-weight: 600;
-            padding: 12px 10px;
-            text-align: left;
-            border-bottom: 2px solid var(--border-light);
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
-        
-        tbody tr {
-            border-bottom: 1px solid var(--border-light);
-            transition: background-color 0.2s ease;
-        }
-        
-        tbody tr:hover {
-            background-color: var(--hover-row);
-        }
-        
-        tbody td {
-            padding: 10px;
-            vertical-align: middle;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Ajustes de ancho para columnas de tabla (de index.html) */
-        th:nth-child(1), td:nth-child(1) { min-width: 90px; } /* Fecha */
-        th:nth-child(2), td:nth-child(2) { min-width: 70px; } /* Hora */
-        th:nth-child(3), td:nth-child(3) { min-width: 140px; } /* Moneda Usada */
-        th:nth-child(4), td:nth-child(4) { min-width: 130px; } /* Cantidad Usada */
-        th:nth-child(5), td:nth-child(5) { min-width: 140px; } /* Moneda Comprada */
-        th:nth-child(6), td:nth-child(6) { min-width: 130px; } /* Cantidad Comprada */
-        th:nth-child(7), td:nth-child(7) { min-width: 150px; } /* Precio Unidad */
-
-        /* Celdas de moneda en tabla */
-        .currency-cell {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            height: auto;
-        }
-        .currency-cell .currency-code {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: calc(100% - 26px);
-            display: inline-block;
-        }
-        .numeric-value {
-            font-family: 'Roboto Mono', monospace;
-            text-align: right;
-            color: var(--text-dark);
-            font-weight: 400;
-            font-size: 0.9rem;
-        }
-
-        /* Estilos para estado vacío de tabla */
-        .empty-state-card {
-            text-align: center;
-            padding: 60px 20px;
-            background-color: var(--light-bg);
-            border: 2px dashed var(--border-light);
-            border-radius: 10px;
-            margin-top: 30px;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
-        }
-        .empty-state-message {
-            font-size: 1.25rem;
-            color: var(--text-medium);
-            margin-bottom: 25px;
-            font-weight: 400;
-        }
-
-
-        /* Estilos de Botones (comunes para todos los botones de acción) */
-        .btn-download-pdf, .btn-primary-action, button[type="submit"]:not([data-pico-variant]), input[type="submit"]:not([data-pico-variant]) {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: linear-gradient(45deg, var(--accent-purple), #9C27B0); /* Degradado púrpura por defecto */
-            color: white;
-            padding: 12px 22px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+        /* Botones premium */
+        .btn-download-pdf {
+            background: linear-gradient(45deg, var(--accent-purple), #9c27b0);
             border: none;
-            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
             position: relative;
             overflow: hidden;
-            z-index: 1;
-            white-space: nowrap; /* Evita que el texto del botón se rompa */
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        /* Efecto de brillo al pasar el mouse */
-        .btn-download-pdf::before, .btn-primary-action::before, button[type="submit"]:not([data-pico-variant])::before, input[type="submit"]:not([data-pico-variant])::before {
+        
+        .btn-download-pdf::before {
             content: '';
             position: absolute;
             top: 0;
@@ -334,436 +155,400 @@
             background: rgba(255, 255, 255, 0.2);
             transform: skewX(-20deg);
             transition: all 0.4s ease;
-            z-index: 0;
         }
-        .btn-download-pdf:hover::before, .btn-primary-action:hover::before, button[type="submit"]:not([data-pico-variant]):hover::before, input[type="submit"]:not([data-pico-variant]):hover::before {
+        
+        .btn-download-pdf:hover::before {
             left: 100%;
         }
-        /* Efectos al pasar el mouse y al hacer click */
-        .btn-download-pdf:hover, .btn-primary-action:hover, button[type="submit"]:not([data-pico-variant]):hover, input[type="submit"]:not([data-pico-variant]):hover {
-            transform: translateY(-3px);
+        
+        .btn-download-pdf:hover {
+            transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(111, 66, 193, 0.4);
         }
-        .btn-download-pdf:active, .btn-primary-action:active, button[type="submit"]:not([data-pico-variant]):active, input[type="submit"]:not([data-pico-variant]):active {
+        
+        .btn-download-pdf:active {
             transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(111, 66, 193, 0.2);
         }
-
-        /* Variantes de botones */
-        .btn-sm { /* Botones pequeños */
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 8px rgba(111, 66, 193, 0.2);
+        
+        /* Tablas premium */
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
-        .btn-sm:hover {
-            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+        
+        .table {
+            margin-bottom: 0;
         }
-        .btn-sm.primary { /* Para diferenciar si Pico.css se aplica primero */
-            background: linear-gradient(45deg, var(--accent-purple), #9C27B0);
+        
+        .table thead th {
+            background-color: var(--header-bg);
+            color: var(--table-header-font);
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom-width: 2px;
         }
-
-        .btn-sm.secondary { /* Botón de recalcular/secundario */
-            background: var(--text-medium); /* Color gris/medio */
-            box-shadow: none;
+        
+        .table tbody tr {
+            transition: all 0.2s ease;
         }
-        .btn-sm.secondary:hover {
-            background: #5c636a; /* Gris más oscuro al hover */
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        
+        .table tbody tr:hover {
+            background-color: var(--hover-row);
         }
-        .btn-sm.secondary::before {
-            background: rgba(255, 255, 255, 0.1);
+        
+        .table td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
         }
-        /* Icono para botón de descarga PDF */
-        .icon-download-pdf {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2.5;
+        
+        .currency-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-
-        /* Estilos de Mensajes Flash */
+        
+        .crypto-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .numeric-value {
+            font-family: 'Roboto Mono', monospace;
+            text-align: right;
+        }
+        
+        /* Estado vacío */
+        .empty-state-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            background-color: var(--light-bg);
+            border: 2px dashed var(--border-light);
+            border-radius: 0.75rem;
+            margin-top: 2rem;
+        }
+        
+        .empty-state-message {
+            font-size: 1.25rem;
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Mensajes flash */
         .flash-message {
-            padding: 0.8rem 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0.3rem;
-            font-size: 0.95em;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
         }
+        
         .flash-message.error {
             background-color: var(--flash-error-bg);
             color: var(--flash-error-text);
             border: 1px solid var(--flash-error-border);
         }
+        
         .flash-message.success {
             background-color: var(--flash-success-bg);
             color: var(--flash-success-text);
             border: 1px solid var(--flash-success-border);
         }
-        .flash-message.error::before { content: "🚫"; }
-        .flash-message.success::before { content: "✅"; }
-
-        /* Estilos para Información de Ayuda */
+        
+        /* Info de ayuda */
         .help-info {
             background-color: var(--help-info-bg);
             border-left: 4px solid var(--help-info-border);
-            padding: 1rem;
+            padding: 1.25rem;
             margin-bottom: 1.5rem;
-            border-radius: 6px;
+            border-radius: 0.5rem;
             color: var(--help-info-text);
-            font-size: 0.95em;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .help-info ul {
-            margin: 0.75rem 0 0 1.5rem;
-            padding: 0;
-            list-style-type: disc;
-        }
-        .help-info li {
-            margin-bottom: 0.4rem;
-        }
+        
         .help-info strong {
             color: var(--help-info-strong);
         }
-
-        /* Estilos de Formulario */
-        form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem; /* Mantenemos un buen espacio entre secciones del formulario */
-    padding: 2rem; /* Añadimos padding al formulario para que no se pegue a los bordes */
-    background-color: #ffffff; /* Fondo blanco para el formulario, destacándolo */
-    border-radius: 8px; /* Bordes ligeramente redondeados para un aspecto suave */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra sutil para darle profundidad */
-}
-
-.form-row {
-    display: flex;
-    gap: 1.25rem; /* Aumento sutil en el espacio entre elementos de la fila para mayor claridad */
-    flex-wrap: wrap;
-    justify-content: space-between; /* Distribuye el espacio entre los grupos */
-}
-
-.form-group {
-    flex: 1;
-    min-width: 280px; /* Incrementamos ligeramente el ancho mínimo para mejor legibilidad en pantallas pequeñas */
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.5rem; /* Pequeño margen inferior para separar grupos visualmente */
-}
-
-.form-group label {
-    font-size: 0.95rem; /* Ligeramente más grande para mayor legibilidad */
-    color: var(--text-dark); /* Color más oscuro para las etiquetas para mejor contraste */
-    margin-bottom: 0.6rem; /* Aumentamos el espacio entre la etiqueta y el input */
-    font-weight: 600; /* Hacemos las etiquetas más robustas */
-    display: block; /* Asegura que cada etiqueta ocupe su propia línea */
-}
-
-input[type="number"],
-select {
-    padding: 0.85rem 1.1rem; /* Un poco más de padding para hacer los campos más "tocables" */
-    border: 1px solid var(--border-light);
-    border-radius: 8px; /* Bordes un poco más redondeados para suavizar el diseño */
-    font-size: 1rem;
-    color: var(--text-dark);
-    background-color: #ffffff; /* Fondo blanco para los inputs */
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06); /* Sombra interna sutil para dar profundidad */
-}
-
-input[type="number"]:focus,
-select:focus {
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px var(--input-focus-shadow); /* La sombra de enfoque más prominente */
-    outline: none;
-    background-color: #fff; /* Asegura que el fondo no cambie al enfocar */
-}
-
-/* Estilos para placeholdes (opcional pero recomendable) */
-input::placeholder {
-    color: var(--text-medium);
-    opacity: 0.7; /* Ligeramente más transparente */
-}
-
-/* Estilos para mensajes de error (si los necesitas) */
-.form-group.has-error input,
-.form-group.has-error select {
-    border-color: var(--error-red);
-}
-
-.form-group.has-error .error-message {
-    color: var(--error-red);
-    font-size: 0.85rem;
-    margin-top: 0.4rem;
-}
-        /* Flecha personalizada para select */
-        select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 16px;
-            padding-right: 2.5rem;
+        
+        /* Formularios */
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
         }
-        select::-ms-expand { display: none; } /* Ocultar flecha en IE/Edge */
-
-        /* Estilos para la sección de resultados de cálculo */
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Resultados */
         .results {
             background-color: var(--header-bg);
-            border-radius: 8px;
+            border-radius: 0.75rem;
             padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
         }
+        
         .result-line {
             display: flex;
             justify-content: space-between;
-            font-size: 1rem;
-            color: var(--text-dark);
+            margin-bottom: 0.75rem;
         }
-        .result-line span:first-child {
-            font-weight: 500;
-            color: var(--text-medium);
-        }
-        .result-line span:last-child {
-            font-family: 'Roboto Mono', monospace;
-            font-weight: 500;
-            color: var(--primary-blue);
-        }
+        
         .result-line.highlight {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            color: var(--dark-blue);
-            padding-top: 0.5rem;
+            padding-top: 0.75rem;
             border-top: 1px dashed var(--border-light);
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
         }
-        .result-line.highlight span:last-child {
-            color: var(--secondary-green);
-            font-size: 1.25rem;
+        
+        /* Footer */
+        footer {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
         }
-        .button-row {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .button-row .btn-sm {
-            flex-grow: 0;
-            width: auto;
-        }
-
-
-        /* Responsividad general */
-        @media (max-width: 1300px) {
-            .main-content-wrapper {
-                margin-left: 20px;
-                margin-right: 20px;
-            }
-        }
-
-        @media (max-width: 992px) { /* Tabletas */
-            .main-content-wrapper {
-                padding: 25px;
-                margin: 25px auto;
-            }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
             .card-header-section h2 {
-                font-size: 1.9rem;
+                font-size: 1.75rem;
             }
-            .btn-download-pdf, .btn-primary-action, button[type="submit"]:not([data-pico-variant]), input[type="submit"]:not([data-pico-variant]) {
-                padding: 10px 18px;
-                font-size: 0.9rem;
-                gap: 6px;
-            }
-            .icon-download-pdf {
-                width: 18px;
-                height: 18px;
-            }
-            /* Activamos el scroll horizontal para tablas en tabletas */
-            .table-container {
-                overflow-x: auto;
-            }
-            table {
-                min-width: 900px; /* Mantener min-width para legibilidad, pero con scroll */
-            }
-            thead th, tbody td {
-                padding: 10px 8px;
-                font-size: 0.85rem;
-            }
-            .crypto-icon {
-                width: 18px;
-                height: 18px;
-            }
-            .numeric-value, .currency-code {
-                font-size: 0.85rem;
-            }
-            .help-info {
-                font-size: 0.85em;
-            }
-            .flash-message {
-                font-size: 0.88em;
-            }
-            .form-group {
-                min-width: unset; /* Deshacer el min-width para móviles */
-                width: 100%; /* Ocupar todo el ancho disponible */
+            
+            .main-content-wrapper {
+                padding: 1.5rem;
             }
         }
-
-        @media (max-width: 768px) { /* Móviles grandes */
-            .header-container {
-                flex-direction: column;
-                gap: 0.75rem;
-                padding: 0.5rem;
-            }
-            nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0.4rem;
-            }
-            nav a[role="button"] {
-                padding: 0.35rem 0.8rem;
-                font-size: 0.85rem;
-            }
-            main.container {
-                padding: 1rem;
-            }
-            .main-content-wrapper {
-                padding: 20px;
-                margin: 20px auto;
-            }
+        
+        @media (max-width: 768px) {
             .card-header-section {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 15px;
+                gap: 1rem;
             }
-            .card-header-section h2 {
-                font-size: 1.7rem;
-            }
-            .btn-download-pdf {
-                width: 100%;
-                justify-content: center;
-            }
-            /* Tabla en móvil siempre con scroll horizontal */
-            table {
-                min-width: 700px;
-                width: auto;
-            }
-            thead th, tbody td {
-                padding: 8px;
-                font-size: 0.8rem;
-            }
-            .currency-cell {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                gap: 2px;
-                white-space: normal;
-                overflow: visible;
-                text-overflow: clip;
-            }
-            .currency-cell .currency-code {
-                white-space: normal;
-                max-width: 100%;
-                text-overflow: clip;
-            }
-            .crypto-icon {
-                margin-right: 0;
-            }
-            /* Formulario en móvil: apilar elementos */
-            .form-row {
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-            .button-row {
-                flex-direction: column;
-                gap: 0.8rem;
-            }
-            .button-row .btn-sm {
-                width: 100%;
+            
+            .navbar-brand {
+                font-size: 1.5rem;
             }
         }
-
-        @media (max-width: 480px) { /* Móviles pequeños */
+        
+        @media (max-width: 576px) {
             .main-content-wrapper {
-                padding: 15px;
-                margin: 15px auto;
-                border-radius: 8px;
+                padding: 1.25rem;
             }
+            
             .card-header-section h2 {
                 font-size: 1.5rem;
             }
-            .btn-download-pdf span { /* Ocultar texto "Descargar Informe PDF" */
+            
+            .btn-download-pdf span {
                 display: none;
             }
-            .btn-download-pdf { /* Convertir botón a solo icono */
-                padding: 10px;
-                border-radius: 50%;
+            
+            .btn-download-pdf {
                 width: 40px;
                 height: 40px;
+                border-radius: 50%;
+                padding: 0;
                 justify-content: center;
             }
-            .icon-download-pdf {
-                width: 20px;
-                height: 20px;
+        }
+        
+        /* Estilos específicos para status.html */
+        .summary-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .metric-item {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .large-metric .metric-value {
+            font-size: 1.75rem;
+        }
+        
+        .positive {
+            color: var(--secondary-green) !important;
+        }
+        
+        .negative {
+            color: #dc3545 !important;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 2rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .crypto-detail-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .crypto-item {
+            background-color: white;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .crypto-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .crypto-name {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .crypto-stats {
+            display: flex;
+            gap: 1.5rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .chart-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+            height: 350px;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-metrics {
+                grid-template-columns: 1fr 1fr;
             }
-            thead th, tbody td {
-                padding: 6px;
-                font-size: 0.75rem;
+            
+            .crypto-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-end;
             }
-            .help-info {
-                font-size: 0.8em;
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
             }
-            .flash-message {
-                font-size: 0.85em;
+        }
+        
+        @media (max-width: 576px) {
+            .summary-metrics {
+                grid-template-columns: 1fr;
             }
-            .results {
-                padding: 1rem;
+            
+            .metric-value {
+                font-size: 1.25rem;
             }
-            .result-line {
-                font-size: 0.9rem;
+            
+            .large-metric .metric-value {
+                font-size: 1.5rem;
             }
-            .result-line.highlight {
-                font-size: 1.05rem;
+            
+            .crypto-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .crypto-stats {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
             }
         }
     </style>
-    {# BLOQUE PARA ESTILOS ESPECÍFICOS DE CADA PÁGINA #}
-    {% block page_styles %}{% endblock %} 
+    {% block page_styles %}{% endblock %}
 </head>
 <body>
-
-    <header>
-        <div class="header-container">
-            <div class="logo">
-                <span class="logo-icon">📊</span>
-                <h1>Resumen de Inversiones</h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/" role="button" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
-                    <li><a href="/purchase" role="button" class="{% if request.path == '/purchase' %}active{% endif %}">Compra</a></li>
-                    <li><a href="/status" role="button" class="{% if request.path == '/status' %}active{% endif %}">Estado</a></li>
+    <!-- Navbar premium -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-graph-up"></i> Resumen de Inversiones
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/purchase' %}active{% endif %}" href="/purchase">Compra</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/status' %}active{% endif %}" href="/status">Estado</a>
+                    </li>
                 </ul>
-            </nav>
+            </div>
         </div>
-    </header>
+    </nav>
 
     <main class="container">
         {% block section %}
         {% endblock %}
     </main>
 
-    <footer>
-        <small>&copy; 2025 - Manuel Jesús Martos Martos. Todos los derechos reservados.</small>
+    <footer class="mt-auto">
+        <div class="container">
+            <small>&copy; 2025 - Manuel Jesús Martos Martos. Todos los derechos reservados.</small>
+        </div>
     </footer>
 
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts %}{% endblock %}
 </body>
 </html>

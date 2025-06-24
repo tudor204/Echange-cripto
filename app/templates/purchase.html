@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block section %}
-
 <section class="main-content-wrapper">
     <div class="card-header-section">
         <h2>Compra/Venta</h2>
@@ -16,21 +15,21 @@
         {% endif %}
     {% endwith %}
 
-    <p class="small-text help-info">
+    <div class="alert alert-info help-info">
         <strong>Reglas de Operación:</strong>
-        <ul>
-            <li>Puedes **comprar cualquier criptomoneda** con Euros (EUR).</li>
-            <li>Puedes **vender cualquier criptomoneda** a Euros (EUR).</li>
-            <li>Puedes **intercambiar** cualquier criptomoneda que poseas por otra criptomoneda disponible.</li>
+        <ul class="mb-0">
+            <li>Puedes <strong>comprar cualquier criptomoneda</strong> con Euros (EUR).</li>
+            <li>Puedes <strong>vender cualquier criptomoneda</strong> a Euros (EUR).</li>
+            <li>Puedes <strong>intercambiar</strong> cualquier criptomoneda que poseas por otra criptomoneda disponible.</li>
             <li>No puedes operar con la misma criptomoneda como origen y destino.</li>
         </ul>
-    </p>
+    </div>
 
-    <form method="POST" action="/purchase">
-        <div class="form-row">
-            <div class="form-group"> {# Quité la clase 'compact' ya no es necesaria con el nuevo flex #}
-                <label for="fromCurrencySelect">De</label>
-                <select name="from_currency" id="fromCurrencySelect">
+    <form method="POST" action="/purchase" class="needs-validation" novalidate>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label for="fromCurrencySelect" class="form-label">De</label>
+                <select name="from_currency" id="fromCurrencySelect" class="form-select" required>
                     {% for moneda in monedas_from %}
                     <option value="{{ moneda }}"
                         {% if moneda == moneda_from %}selected
@@ -42,10 +41,9 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="toCurrencySelect">A</label>
-                <select name="to_currency" id="toCurrencySelect">
-                    {# IMPORTANTE: Ahora iteramos sobre todas_criptos para permitir cualquier destino #}
+            <div class="col-md-6">
+                <label for="toCurrencySelect" class="form-label">A</label>
+                <select name="to_currency" id="toCurrencySelect" class="form-select" required>
                     {% for moneda in todas_criptos %}
                     <option value="{{ moneda }}"
                         {% if moneda == moneda_to %}selected{% endif %}>
@@ -56,11 +54,12 @@
             </div>
         </div>
 
-        <div class="form-group"> 
-            <label for="amountInput">Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
-            <input type="number" name="amount" id="amountInput" min="0.000001" step="any"
-                value="{{ cantidad_from if cantidad_from else '' }}"
-                placeholder="Ej: 1000.00" />
+        <div class="mb-4">
+            <label for="amountInput" class="form-label">Cantidad ({{ moneda_from if moneda_from else 'EUR' }})</label>
+            <input type="number" name="amount" id="amountInput" class="form-control" 
+                   min="0.000001" step="any" required
+                   value="{{ cantidad_from if cantidad_from else '' }}"
+                   placeholder="Ej: 1000.00">
         </div>
 
         {% if accion == 'calcular' %}
@@ -74,20 +73,40 @@
                 <span>{{ '{:,.4f}'.format(cantidad_to | float).replace(',', 'TEMP').replace('.', ',').replace('TEMP', '.') }} {{ moneda_to }}</span>
             </div>
 
-            <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}" />
-            <input type="hidden" name="tasa_cambio_oculto" value="{{ tasa_cambio }}" />
+            <input type="hidden" name="cantidad_to" value="{{ cantidad_to }}">
+            <input type="hidden" name="tasa_cambio_oculto" value="{{ tasa_cambio }}">
 
-            <div class="button-row">
-                <button type="submit" name="accion" value="validar" class="btn-sm primary">Validar</button>
-                <button type="submit" name="accion" value="calcular" class="btn-sm secondary">Recalcular</button>
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <button type="submit" name="accion" value="validar" class="btn btn-primary">Validar</button>
+                <button type="submit" name="accion" value="calcular" class="btn btn-secondary">Recalcular</button>
             </div>
         </div>
         {% else %}
-        <button type="submit" name="accion" value="calcular" class="btn-primary-action">Calcular</button> {# Usamos la clase más genérica #}
+        <button type="submit" name="accion" value="calcular" class="btn btn-primary btn-lg">Calcular</button>
         {% endif %}
     </form>
 </section>
 
+<script>
+// Validación del formulario
+(function () {
+  'use strict'
 
+  // Obtener todos los formularios a los que queremos aplicar estilos de validación de Bootstrap personalizados
+  var forms = document.querySelectorAll('.needs-validation')
 
+  // Bucle sobre ellos y evitar el envío
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
 {% endblock %}
