@@ -1,10 +1,128 @@
 {% extends "base.html" %}
 
+{% block page_styles %}
+<style>
+    /* Estilos para la tabla */
+    .table-responsive {
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        white-space: nowrap;
+    }
+    
+    .table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .table tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* Estilos para celdas específicas */
+    .currency-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 120px;
+    }
+    
+    .numeric-value {
+        font-family: 'Courier New', monospace;
+        text-align: right;
+        white-space: nowrap;
+    }
+    
+    .crypto-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    /* Estilos para el estado vacío */
+    .empty-state-card {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin: 2rem 0;
+    }
+    
+    .empty-state-message {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    /* Estilos para el botón de descarga */
+    .btn-download-pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #dc3545;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-download-pdf:hover {
+        background-color: #bb2d3b;
+        color: white;
+    }
+    
+    /* Cabecera de la sección */
+    .card-header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .table th, 
+        .table td {
+            padding: 8px 10px;
+            font-size: 0.85rem;
+        }
+        
+        .card-header-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block section %}
 {% set icon_base = "https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.17.1/svg/color/" %}
 {% set icon_map = {
     'btc': 'btc.svg', 'eth': 'eth.svg', 'usdt': 'usdt.svg', 'bnb': 'bnb.svg',
-    'ada': 'ada.svg', 'xrp': 'xrp.svg', 'xrp': 'xrp.svg', 'sol': 'sol.svg', 'dot': 'dot.svg',
+    'ada': 'ada.svg', 'xrp': 'xrp.svg', 'sol': 'sol.svg', 'dot': 'dot.svg',
     'ltc': 'ltc.svg', 'doge': 'doge.svg', 'eur': 'eur.svg', 'usd': 'usd.svg'
 } %}
 
@@ -25,10 +143,10 @@
                     <th>Fecha</th>
                     <th>Hora</th>
                     <th>Moneda Usada</th>
-                    <th>Cantidad</th>
+                    <th class="text-right">Cantidad</th>
                     <th>Moneda Comprada</th>
-                    <th>Cantidad Compra</th>
-                    <th>P.U</th>
+                    <th class="text-right">Cantidad Compra</th>
+                    <th class="text-right">P.U</th>
                 </tr>
             </thead>
             <tbody>

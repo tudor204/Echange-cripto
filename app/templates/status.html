@@ -6,11 +6,104 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        height: 400px; /* Altura fija para mantener consistencia */
+    }
+    
+    .chart-container h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 300px;
+        flex-grow: 1;
     }
     
     @media (max-width: 768px) {
         .chart-grid {
             grid-template-columns: 1fr;
+        }
+        
+        .chart-container {
+            height: 350px; /* Altura menor en móviles */
+        }
+    }
+
+    .crypto-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .crypto-table th {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+    }
+    
+    .crypto-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .crypto-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .crypto-table tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .crypto-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .crypto-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .text-left {
+        text-align: left;
+    }
+    
+    .text-right {
+        text-align: right;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    @media (max-width: 768px) {
+        .crypto-table {
+            font-size: 0.8rem;
+        }
+        
+        .crypto-table th, 
+        .crypto-table td {
+            padding: 8px 10px;
         }
     }
 </style>
@@ -74,30 +167,57 @@
     </div>
 
     <!-- Sección de detalle de criptomonedas -->
-    <h3 class="section-title">Detalle de Criptomonedas:</h3>
-    <div class="crypto-detail-list">
-        {% for m, info in cripto_valores.items() %}
-            <div class="crypto-item">
-                <div class="crypto-name">
+<h3 class="section-title">Detalle de Criptomonedas</h3>
+<div class="table-responsive">
+    <table class="crypto-table">
+        <thead>
+            <tr>
+                <th class="text-left">Criptomoneda</th>
+                <th class="text-right">Cantidad</th>
+                <th class="text-right">Precio Unitario</th>
+                <th class="text-right">Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m, info in cripto_valores.items() %}
+            <tr>
+                <td class="text-left crypto-name">
                     {% if m|lower in icon_map %}
-                        <img src="{{ icon_base }}{{ icon_map[m|lower] }}" alt="{{ m }} icon" class="crypto-icon">
+                    <img src="{{ icon_base }}{{ icon_map[m|lower] }}" alt="{{ m }} icon" class="crypto-icon">
                     {% endif %}
                     {{ m }}
-                </div>
-                <div class="crypto-stats">
-                    <span class="crypto-balance">{{ '{:,.6f}'.format(info.saldo) | replace(',', '_') | replace('.', ',') | replace('_', '.') }}</span>
-                    <span class="text-muted">unidades</span>
-                    <span class="crypto-price">@ {{ '{:,.2f}'.format(info.tasa) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
-                    <span class="crypto-total">{{ '{:,.2f}'.format(info.euros) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</span>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+                </td>
+                <td class="text-right">{{ '{:,.6f}'.format(info.saldo) | replace(',', '_') | replace('.', ',') | replace('_', '.') }}</td>
+                <td class="text-right">{{ '{:,.2f}'.format(info.tasa) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</td>
+                <td class="text-right">{{ '{:,.2f}'.format(info.euros) | replace(',', '_') | replace('.', ',') | replace('_', '.') }} EUR</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 </section>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Configuración común para ambos gráficos
+    const commonChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.dataset.label}: ${context.raw.toFixed(2)} EUR`;
+                    }
+                }
+            }
+        }
+    };
+
     // Gráfico de evolución
     const evolutionCtx = document.getElementById('evolutionChart');
     if (evolutionCtx) {
@@ -116,20 +236,7 @@
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw.toFixed(2)} EUR`;
-                            }
-                        }
-                    }
-                },
+                ...commonChartOptions,
                 scales: {
                     y: {
                         beginAtZero: false,
@@ -161,8 +268,7 @@
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                ...commonChartOptions,
                 plugins: {
                     legend: {
                         position: 'right',
@@ -176,7 +282,8 @@
                             }
                         }
                     }
-                }
+                },
+                cutout: '60%' // Hace el donut más delgado para mejor visualización
             }
         });
     }
